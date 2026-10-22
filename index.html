@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Where Estero Decides</title>
+<meta name="description" content="Ten years of Village of Estero decisions on a live map. Explore, take the drive, vote like the council.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://js.arcgis.com/4.31/esri/themes/light/main.css" media="(prefers-color-scheme: light)">
+<link rel="stylesheet" href="https://js.arcgis.com/4.31/esri/themes/dark/main.css" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+<header>
+  <span class="eyebrow">Engage Estero · EagleGIS</span>
+  <h1>Where Estero Decides</h1>
+  <p class="lede">Most residents never read an agenda. But almost every decision touched a spot they drive past. Explore it, drive it, vote on it.</p>
+  <div class="facts" id="facts"></div>
+  <span class="live" id="liveBadge"><i></i><span>Connecting to the live map…</span></span>
+  <nav class="toc" aria-label="Chapters">
+    <a href="#explore">1 · Explore the map</a><a href="#drive">2 · Take the drive</a><a href="#council">3 · You're on the council</a><a href="#time">4 · Time machine</a><a href="#guess">5 · Guess the hotspot</a>
+  </nav>
+</header>
+
+<!-- 1 EXPLORE -->
+<section class="chapter" id="explore">
+  <div class="chapter-head"><span class="eyebrow">Chapter 1</span><h2>Explore every decision</h2><p class="muted">This is the live EagleGIS web map. Turn categories on and off, filter by outcome, board or year, or search a street name. Click a point or cluster to read it.</p></div>
+  <div class="stage">
+    <div class="map" id="mapExplore" role="region" aria-label="Map of mapped decisions"></div>
+    <div class="panel filters">
+      <div class="summary"><span class="big" id="fCount">0</span><span class="muted" id="fSub"></span></div>
+      <div class="fgrid">
+        <label class="wide">Search<input type="search" id="fSearch" placeholder="Corkscrew, Walmart, sidewalk…"></label>
+        <label>Outcome<select id="fOut"><option value="">All outcomes</option></select></label>
+        <label>Board<select id="fType"><option value="">All boards</option></select></label>
+        <label>From<select id="fFrom"></select></label>
+        <label>To<select id="fTo"></select></label>
+      </div>
+      <div class="legend" id="legend" role="group" aria-label="Category layers"></div>
+      <div class="row"><button id="fReset">Reset filters</button></div>
+    </div>
+  </div>
+  <div class="listwrap">
+    <div class="listhead"><h3>Matching items</h3><span class="muted" id="lInfo"></span></div>
+    <div class="list" id="list"></div>
+    <div class="listhead" style="justify-content:center"><button id="more">Show more</button></div>
+  </div>
+</section>
+
+<!-- 2 DRIVE -->
+<section class="chapter" id="drive">
+  <div class="chapter-head"><span class="eyebrow">Chapter 2</span><h2>Take the drive</h2><p class="muted">Pick a road you use. Every dot within a couple of blocks is something the Village decided.</p></div>
+  <div class="stage">
+    <div class="map" id="mapDrive" role="region" aria-label="Map with a driving route"></div>
+    <div class="panel">
+      <div class="row" id="routeBtns" role="group" aria-label="Choose a road"></div>
+      <div class="row"><button class="primary" id="goBtn">Drive it</button><span class="muted" id="driveStatus"></span></div>
+      <div><div class="big" id="passed">0</div><span class="muted" id="passedSub">decisions along this road</span></div>
+      <div class="feed" id="feed" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 COUNCIL -->
+<section class="chapter" id="council">
+  <div class="chapter-head"><span class="eyebrow">Chapter 3</span><h2>You're on the council</h2><p class="muted">Five real cases from the records. Make the call, then see what Estero actually did.</p></div>
+  <div class="stage">
+    <div class="map" id="mapCouncil" role="region" aria-label="Location of the current case"></div>
+    <div class="panel"><div class="progress" id="prog"></div><div class="case" id="caseBox" aria-live="polite"></div></div>
+  </div>
+</section>
+
+<!-- 4 TIME -->
+<section class="chapter" id="time">
+  <div class="chapter-head"><span class="eyebrow">Chapter 4</span><h2>Time machine</h2><p class="muted">Drag through the years and watch the map fill in.</p></div>
+  <div class="stage">
+    <div class="map" id="mapTime" role="region" aria-label="Decisions up to the chosen year"></div>
+    <div class="panel">
+      <div><div class="big" id="tYear"></div><span class="muted" id="tCount"></span></div>
+      <div><div class="spark" id="spark" aria-hidden="true"></div><div class="yearline" id="yearline" aria-hidden="true"></div></div>
+      <div><label for="yr" class="eyebrow">Year</label><input id="yr" type="range" min="2015" max="2026" value="2015"></div>
+      <div class="row"><button id="playBtn">Play the decade</button></div>
+      <div id="tTop" class="muted"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 GUESS -->
+<section class="chapter" id="guess">
+  <div class="chapter-head"><span class="eyebrow">Chapter 5</span><h2>Guess the hotspot</h2><p class="muted">Tap the map where you think the most decisions landed.</p></div>
+  <div class="stage">
+    <div class="map" id="mapGuess" role="region" aria-label="Tap to guess the busiest spot" style="cursor:crosshair"></div>
+    <div class="panel"><div id="guessOut" aria-live="polite"><p class="muted">No guess yet. Tap anywhere on the map.</p></div><div class="row"><button id="guessReset">Try again</button></div></div>
+  </div>
+</section>
+
+<section class="cta">
+  <span class="eyebrow">Still curious?</span>
+  <h2>Ask about any spot in Estero</h2>
+  <p class="muted">Ask EagleGIS a question in plain English. Every answer links back to the meeting it came from.</p>
+  <div class="row"><a class="btnlink" href="https://tracker.esterotoday.com" target="_blank" rel="noopener">Open Ask Engage Estero</a></div>
+</section>
+
+<footer>
+  <span id="foot"></span>
+  <span>Source: Village of Estero Council and Planning Zoning &amp; Design Board minutes, processed by the EagleGIS team for Engage Estero. Maps and points load live from the Engage Estero ArcGIS layer. Totals in the header come from the full records snapshot, which includes items with no mapped location.</span>
+</footer>
+</div>
+
+<script src="https://js.arcgis.com/4.31/"></script>
+<script src="app.js"></script>
+</body>
+</html>
