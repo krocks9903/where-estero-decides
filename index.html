@@ -13,20 +13,28 @@
 </head>
 <body>
 <div class="wrap">
-<header>
-  <span class="eyebrow">Engage Estero · EagleGIS</span>
-  <h1>Where Estero Decides</h1>
-  <p class="lede">Most residents never read an agenda. But almost every decision touched a spot they drive past. Explore it, drive it, vote on it.</p>
-  <div class="facts" id="facts"></div>
+<div class="topbar">
+  <span class="brand"><img src="assets/engage-estero-logo.png" alt="Engage Estero" width="160" height="68"></span>
   <span class="live" id="liveBadge"><i></i><span>Connecting to the live map…</span></span>
+</div>
+<header class="hero">
+  <img class="hero-img" src="assets/hero.jpg" alt="Waterfront shops and restaurants in Estero at sunset" width="1600" height="1066">
+  <div class="hero-text">
+    <span class="eyebrow">Ten years of Village decisions · 2015 to 2026</span>
+    <h1>Where Estero Decides</h1>
+    <p class="lede">Most residents never read an agenda. But almost every decision touched a spot they drive past. Explore it, drive it, vote on it.</p>
+  </div>
+</header>
+<div class="intro">
+  <div class="facts" id="facts"></div>
   <nav class="toc" aria-label="Chapters">
     <a href="#explore">1 · Explore the map</a><a href="#drive">2 · Take the drive</a><a href="#council">3 · You're on the council</a><a href="#time">4 · Time machine</a><a href="#guess">5 · Guess the hotspot</a>
   </nav>
-</header>
+</div>
 
 <!-- 1 EXPLORE -->
 <section class="chapter" id="explore">
-  <div class="chapter-head"><span class="eyebrow">Chapter 1</span><h2>Explore every decision</h2><p class="muted">This is the live EagleGIS web map. Turn categories on and off, filter by outcome, board or year, or search a street name. Click a point or cluster to read it.</p></div>
+  <div class="chapter-head"><span class="eyebrow chap">Chapter 1</span><h2>Explore every decision</h2><p class="muted">This is the live EagleGIS web map. Turn categories on and off, filter by outcome, board or year, or search a street name. Click a point or cluster to read it.</p></div>
   <div class="stage">
     <div class="map" id="mapExplore" role="region" aria-label="Map of mapped decisions"></div>
     <div class="panel filters">
@@ -51,7 +59,7 @@
 
 <!-- 2 DRIVE -->
 <section class="chapter" id="drive">
-  <div class="chapter-head"><span class="eyebrow">Chapter 2</span><h2>Take the drive</h2><p class="muted">Pick a road you use. Every dot within a couple of blocks is something the Village decided.</p></div>
+  <div class="chapter-head"><span class="eyebrow chap">Chapter 2</span><h2>Take the drive</h2><p class="muted">Pick a road you use. Every dot within a couple of blocks is something the Village decided.</p></div>
   <div class="stage">
     <div class="map" id="mapDrive" role="region" aria-label="Map with a driving route"></div>
     <div class="panel">
@@ -65,7 +73,7 @@
 
 <!-- 3 COUNCIL -->
 <section class="chapter" id="council">
-  <div class="chapter-head"><span class="eyebrow">Chapter 3</span><h2>You're on the council</h2><p class="muted">Five real cases from the records. Make the call, then see what Estero actually did.</p></div>
+  <div class="chapter-head"><span class="eyebrow chap">Chapter 3</span><h2>You're on the council</h2><p class="muted">Five real cases from the records. Make the call, then see what Estero actually did.</p></div>
   <div class="stage">
     <div class="map" id="mapCouncil" role="region" aria-label="Location of the current case"></div>
     <div class="panel"><div class="progress" id="prog"></div><div class="case" id="caseBox" aria-live="polite"></div></div>
@@ -74,7 +82,7 @@
 
 <!-- 4 TIME -->
 <section class="chapter" id="time">
-  <div class="chapter-head"><span class="eyebrow">Chapter 4</span><h2>Time machine</h2><p class="muted">Drag through the years and watch the map fill in.</p></div>
+  <div class="chapter-head"><span class="eyebrow chap">Chapter 4</span><h2>Time machine</h2><p class="muted">Drag through the years and watch the map fill in.</p></div>
   <div class="stage">
     <div class="map" id="mapTime" role="region" aria-label="Decisions up to the chosen year"></div>
     <div class="panel">
@@ -89,7 +97,7 @@
 
 <!-- 5 GUESS -->
 <section class="chapter" id="guess">
-  <div class="chapter-head"><span class="eyebrow">Chapter 5</span><h2>Guess the hotspot</h2><p class="muted">Tap the map where you think the most decisions landed.</p></div>
+  <div class="chapter-head"><span class="eyebrow chap">Chapter 5</span><h2>Guess the hotspot</h2><p class="muted">Tap the map where you think the most decisions landed.</p></div>
   <div class="stage">
     <div class="map" id="mapGuess" role="region" aria-label="Tap to guess the busiest spot" style="cursor:crosshair"></div>
     <div class="panel"><div id="guessOut" aria-live="polite"><p class="muted">No guess yet. Tap anywhere on the map.</p></div><div class="row"><button id="guessReset">Try again</button></div></div>
