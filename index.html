@@ -6,118 +6,182 @@
 <title>Where Estero Decides</title>
 <meta name="description" content="Ten years of Village of Estero decisions on a live map. Explore, take the drive, vote like the council.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Source+Sans+3:wght@400;600;700&family=Caveat:wght@600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://js.arcgis.com/4.31/esri/themes/light/main.css" media="(prefers-color-scheme: light)">
 <link rel="stylesheet" href="https://js.arcgis.com/4.31/esri/themes/dark/main.css" media="(prefers-color-scheme: dark)">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="wrap">
-<div class="topbar">
-  <span class="brand"><img src="assets/engage-estero-logo.png" alt="Engage Estero" width="160" height="68"></span>
-  <span class="live" id="liveBadge"><i></i><span>Connecting to the live map…</span></span>
-</div>
-<header class="hero">
-  <img class="hero-img" src="assets/hero.jpg" alt="Waterfront shops and restaurants in Estero at sunset" width="1600" height="1066">
-  <div class="hero-text">
-    <span class="eyebrow">Ten years of Village decisions · 2015 to 2026</span>
-    <h1>Where Estero Decides</h1>
-    <p class="lede">Most residents never read an agenda. But almost every decision touched a spot they drive past. Explore it, drive it, vote on it.</p>
+
+<nav class="topnav" id="topnav" aria-label="Site">
+  <div class="topnav-in">
+    <a class="brand" href="#top"><img src="assets/engage-estero-logo.png" alt="Engage Estero" width="120" height="51"><span class="brand-tag">Inform · Explore · Shape</span></a>
+    <div class="toplinks">
+      <a href="#explore">Explore</a><a href="#drive">Drive</a><a href="#council">Council</a><a href="#guess">Hotspot</a><a href="#time">Timeline</a><a href="#about">About</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <img class="hero-img" src="https://images.unsplash.com/photo-1719415257537-8f8006938a56?w=2000&q=75&auto=format&fit=crop" alt="Aerial view of a Florida neighborhood with lakes at sunset" width="2000" height="1333">
+  <div class="hero-in">
+    <div class="hero-text">
+      <span class="kicker">The Village of Estero</span>
+      <h1>Where Estero Decides</h1>
+      <p class="lede">Explore the places, projects and decisions that shape our community, through ten years of real meeting records, live maps and local stories.</p>
+      <div class="row"><a class="btn btn-ghost" href="#explore">Start exploring <span aria-hidden="true">→</span></a><span class="live" id="liveBadge"><i></i><span>Connecting to the live map…</span></span></div>
+    </div>
+    <p class="script hero-script">Real decisions.<br>Real places.<br>Our Estero.</p>
   </div>
 </header>
-<div class="intro">
-  <div class="facts" id="facts"></div>
-  <nav class="toc" aria-label="Chapters">
-    <a href="#explore">1 · Explore the map</a><a href="#drive">2 · Take the drive</a><a href="#council">3 · You're on the council</a><a href="#time">4 · Time machine</a><a href="#guess">5 · Guess the hotspot</a>
-  </nav>
-</div>
 
-<!-- 1 EXPLORE -->
-<section class="chapter" id="explore">
-  <div class="chapter-head"><span class="eyebrow chap">Chapter 1</span><h2>Explore every decision</h2><p class="muted">This is the live EagleGIS web map. Turn categories on and off, filter by outcome, board or year, or search a street name. Click a point or cluster to read it.</p></div>
-  <div class="stage">
-    <div class="map" id="mapExplore" role="region" aria-label="Map of mapped decisions"></div>
-    <div class="panel filters">
-      <div class="summary"><span class="big" id="fCount">0</span><span class="muted" id="fSub"></span></div>
-      <div class="fgrid">
-        <label class="wide">Search<input type="search" id="fSearch" placeholder="Corkscrew, Walmart, sidewalk…"></label>
-        <label>Outcome<select id="fOut"><option value="">All outcomes</option></select></label>
-        <label>Board<select id="fType"><option value="">All boards</option></select></label>
-        <label>From<select id="fFrom"></select></label>
-        <label>To<select id="fTo"></select></label>
+<div class="layout">
+  <aside class="rail" aria-label="Chapters">
+    <ol id="rail">
+      <li><a href="#welcome" data-sec="welcome">Welcome</a></li>
+      <li><a href="#explore" data-sec="explore">Explore the map</a></li>
+      <li><a href="#drive" data-sec="drive">Take the drive</a></li>
+      <li><a href="#council" data-sec="council">You're on the council</a></li>
+      <li><a href="#guess" data-sec="guess">Guess the hotspot</a></li>
+      <li><a href="#time" data-sec="time">A look back</a></li>
+      <li><a href="#about" data-sec="about">About</a></li>
+    </ol>
+  </aside>
+
+  <main class="main">
+    <section class="welcome" id="welcome">
+      <div class="facts" id="facts"></div>
+      <div class="cards" aria-label="Chapters">
+        <a class="card" href="#drive"><img src="https://images.unsplash.com/photo-1689291959055-961935dfa088?w=700&q=70&auto=format&fit=crop" alt="" loading="lazy"><span class="tag">Transportation</span><h3>Take the drive</h3><p>See how road projects and traffic decisions shape your daily commute.</p><span class="go">Explore →</span></a>
+        <a class="card" href="#council"><img src="https://images.unsplash.com/photo-1607778417094-1fef13315e6e?w=700&q=70&auto=format&fit=crop" alt="" loading="lazy"><span class="tag">Council</span><h3>You're on the council</h3><p>Step into five real cases and see how the Village voted.</p><span class="go">Explore →</span></a>
+        <a class="card" href="#guess"><img src="assets/hero.jpg" alt="" loading="lazy"><span class="tag">Development</span><h3>Guess the hotspot</h3><p>Can you spot where the most decisions landed?</p><span class="go">Explore →</span></a>
+        <a class="card" href="#time"><img src="https://images.unsplash.com/photo-1578142880638-9fc9aba285c2?w=700&q=70&auto=format&fit=crop" alt="" loading="lazy"><span class="tag">Timeline</span><h3>A look back</h3><p>Scrub through 2015 to 2026 and watch the map fill in.</p><span class="go">Explore →</span></a>
       </div>
-      <div class="legend" id="legend" role="group" aria-label="Category layers"></div>
-      <div class="row"><button id="fReset">Reset filters</button></div>
-    </div>
-  </div>
-  <div class="listwrap">
-    <div class="listhead"><h3>Matching items</h3><span class="muted" id="lInfo"></span></div>
-    <div class="list" id="list"></div>
-    <div class="listhead" style="justify-content:center"><button id="more">Show more</button></div>
-  </div>
-</section>
+    </section>
 
-<!-- 2 DRIVE -->
-<section class="chapter" id="drive">
-  <div class="chapter-head"><span class="eyebrow chap">Chapter 2</span><h2>Take the drive</h2><p class="muted">Pick a road you use. Every dot within a couple of blocks is something the Village decided.</p></div>
-  <div class="stage">
-    <div class="map" id="mapDrive" role="region" aria-label="Map with a driving route"></div>
-    <div class="panel">
-      <div class="row" id="routeBtns" role="group" aria-label="Choose a road"></div>
-      <div class="row"><button class="primary" id="goBtn">Drive it</button><span class="muted" id="driveStatus"></span></div>
-      <div><div class="big" id="passed">0</div><span class="muted" id="passedSub">decisions along this road</span></div>
-      <div class="feed" id="feed" aria-live="polite"></div>
-    </div>
-  </div>
-</section>
+    <!-- 1 EXPLORE -->
+    <section class="chapter" id="explore">
+      <div class="chapter-head plain">
+        <span class="eyebrow"><b>01</b> Explore the map</span>
+        <h2>See what's happening across Estero</h2>
+        <p>This is the live EagleGIS web map. Turn categories on and off, filter by outcome, board or year, or search a street name. Click a point or cluster to read it.</p>
+      </div>
+      <div class="stage">
+        <div class="map" id="mapExplore" role="region" aria-label="Map of mapped decisions"></div>
+        <div class="panel filters">
+          <div class="summary"><span class="big" id="fCount">0</span><span class="muted" id="fSub"></span></div>
+          <div class="fgrid">
+            <label class="wide">Search<input type="search" id="fSearch" placeholder="Corkscrew, Walmart, sidewalk…"></label>
+            <label>Outcome<select id="fOut"><option value="">All outcomes</option></select></label>
+            <label>Board<select id="fType"><option value="">All boards</option></select></label>
+            <label>From<select id="fFrom"></select></label>
+            <label>To<select id="fTo"></select></label>
+          </div>
+          <div class="legend" id="legend" role="group" aria-label="Category layers"></div>
+          <div class="row"><button id="fReset">Clear all</button></div>
+        </div>
+      </div>
+      <div class="listwrap">
+        <div class="listhead"><h3>Matching items</h3><span class="muted" id="lInfo"></span></div>
+        <div class="list" id="list"></div>
+        <div class="listhead" style="justify-content:center"><button id="more">Show more</button></div>
+      </div>
+    </section>
 
-<!-- 3 COUNCIL -->
-<section class="chapter" id="council">
-  <div class="chapter-head"><span class="eyebrow chap">Chapter 3</span><h2>You're on the council</h2><p class="muted">Five real cases from the records. Make the call, then see what Estero actually did.</p></div>
-  <div class="stage">
-    <div class="map" id="mapCouncil" role="region" aria-label="Location of the current case"></div>
-    <div class="panel"><div class="progress" id="prog"></div><div class="case" id="caseBox" aria-live="polite"></div></div>
-  </div>
-</section>
+    <!-- 2 DRIVE -->
+    <section class="chapter" id="drive">
+      <div class="banner"><img src="https://images.unsplash.com/photo-1689291959055-961935dfa088?w=1800&q=72&auto=format&fit=crop" alt="Road lined with palm trees" loading="lazy">
+        <div class="banner-text"><span class="eyebrow"><b>02</b> Take the drive</span><h2>Better roads, a stronger Estero</h2><p>Pick a road you use. Every point within a couple of blocks is something the Village decided.</p></div></div>
+      <div class="stage">
+        <div class="map" id="mapDrive" role="region" aria-label="Map with a driving route"></div>
+        <div class="panel">
+          <div class="row" id="routeBtns" role="group" aria-label="Choose a road"></div>
+          <div class="row"><button class="primary" id="goBtn">Start the drive →</button><span class="muted" id="driveStatus"></span></div>
+          <div><div class="big" id="passed">0</div><span class="muted" id="passedSub">decisions along this road</span></div>
+          <div class="feed" id="feed" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
 
-<!-- 4 TIME -->
-<section class="chapter" id="time">
-  <div class="chapter-head"><span class="eyebrow chap">Chapter 4</span><h2>Time machine</h2><p class="muted">Drag through the years and watch the map fill in.</p></div>
-  <div class="stage">
-    <div class="map" id="mapTime" role="region" aria-label="Decisions up to the chosen year"></div>
-    <div class="panel">
-      <div><div class="big" id="tYear"></div><span class="muted" id="tCount"></span></div>
-      <div><div class="spark" id="spark" aria-hidden="true"></div><div class="yearline" id="yearline" aria-hidden="true"></div></div>
-      <div><label for="yr" class="eyebrow">Year</label><input id="yr" type="range" min="2015" max="2026" value="2015"></div>
-      <div class="row"><button id="playBtn">Play the decade</button></div>
-      <div id="tTop" class="muted"></div>
-    </div>
-  </div>
-</section>
+    <!-- 3 COUNCIL -->
+    <section class="chapter" id="council">
+      <div class="banner"><img src="https://images.unsplash.com/photo-1607778417094-1fef13315e6e?w=1800&q=72&auto=format&fit=crop" alt="Wooden chairs and desks in a legislative chamber" loading="lazy">
+        <div class="banner-text"><span class="eyebrow"><b>03</b> You're on the council</span><h2>Make the call</h2><p>Five real cases from the records, from zoning to cell towers. Vote, then see what Estero actually did.</p></div></div>
+      <div class="stage">
+        <div class="map" id="mapCouncil" role="region" aria-label="Location of the current case"></div>
+        <div class="panel"><div class="progress" id="prog"></div><div class="case" id="caseBox" aria-live="polite"></div></div>
+      </div>
+    </section>
 
-<!-- 5 GUESS -->
-<section class="chapter" id="guess">
-  <div class="chapter-head"><span class="eyebrow chap">Chapter 5</span><h2>Guess the hotspot</h2><p class="muted">Tap the map where you think the most decisions landed.</p></div>
-  <div class="stage">
-    <div class="map" id="mapGuess" role="region" aria-label="Tap to guess the busiest spot" style="cursor:crosshair"></div>
-    <div class="panel"><div id="guessOut" aria-live="polite"><p class="muted">No guess yet. Tap anywhere on the map.</p></div><div class="row"><button id="guessReset">Try again</button></div></div>
-  </div>
-</section>
+    <!-- 4 GUESS -->
+    <section class="chapter" id="guess">
+      <div class="banner"><img src="assets/hero.jpg" alt="Waterfront shops and restaurants in Estero at sunset" loading="lazy">
+        <div class="banner-text"><span class="eyebrow"><b>04</b> Guess the hotspot</span><h2>Where does Estero decide the most?</h2><p>Tap the map where you think the most decisions landed. Then see how close you got.</p></div></div>
+      <div class="stage">
+        <div class="map" id="mapGuess" role="region" aria-label="Tap to guess the busiest spot" style="cursor:crosshair"></div>
+        <div class="panel"><div class="tip"><span class="tip-icon" aria-hidden="true">?</span><div><b>Look closely…</b><p class="muted">Think about where shops, new homes and big roads meet.</p></div></div><div id="guessOut" aria-live="polite"><p class="muted">No guess yet. Tap anywhere on the map.</p></div><div class="row"><button id="guessReset">Try again</button></div></div>
+      </div>
+    </section>
 
-<section class="cta">
-  <span class="eyebrow">Still curious?</span>
-  <h2>Ask about any spot in Estero</h2>
-  <p class="muted">Ask EagleGIS a question in plain English. Every answer links back to the meeting it came from.</p>
-  <div class="row"><a class="btnlink" href="https://tracker.esterotoday.com" target="_blank" rel="noopener">Open Ask Engage Estero</a></div>
-</section>
+    <!-- 5 TIME -->
+    <section class="chapter" id="time">
+      <div class="banner"><img src="https://images.unsplash.com/photo-1578142880638-9fc9aba285c2?w=1800&q=72&auto=format&fit=crop" alt="Mangroves along a Florida waterway" loading="lazy">
+        <div class="banner-text"><span class="eyebrow"><b>05</b> A look back</span><h2>Ten years, one slider</h2><p>Drag through the years and watch decisions spread across the Village.</p></div></div>
+      <div class="stage">
+        <div class="map" id="mapTime" role="region" aria-label="Decisions up to the chosen year"></div>
+        <div class="panel">
+          <div><div class="big" id="tYear"></div><span class="muted" id="tCount"></span></div>
+          <div><div class="spark" id="spark" aria-hidden="true"></div><div class="yearline" id="yearline" aria-hidden="true"></div></div>
+          <div><label for="yr" class="eyebrow">Year</label><input id="yr" type="range" min="2015" max="2026" value="2015"></div>
+          <div class="row"><button class="primary" id="playBtn">Play the decade</button></div>
+          <div id="tTop" class="muted"></div>
+        </div>
+      </div>
+    </section>
 
-<footer>
-  <span id="foot"></span>
-  <span>Source: Village of Estero Council and Planning Zoning &amp; Design Board minutes, processed by the EagleGIS team for Engage Estero. Maps and points load live from the Engage Estero ArcGIS layer. Totals in the header come from the full records snapshot, which includes items with no mapped location.</span>
-</footer>
+    <!-- ABOUT -->
+    <section class="about" id="about">
+      <img class="about-img" src="https://images.unsplash.com/photo-1696469014188-e6d7ea983c56?w=1800&q=72&auto=format&fit=crop" alt="Calm river seen from a kayak" loading="lazy">
+      <div class="about-in">
+        <span class="eyebrow"><b>06</b> Our community</span>
+        <h2>Still curious? Ask about any spot.</h2>
+        <p>Ask EagleGIS a question in plain English. Every answer links back to the meeting it came from. Or go straight to the source.</p>
+        <div class="tiles">
+          <a class="tile" href="https://tracker.esterotoday.com" target="_blank" rel="noopener"><span aria-hidden="true">✦</span>Ask Engage Estero</a>
+          <a class="tile" href="https://estero-fl.gov" target="_blank" rel="noopener"><span aria-hidden="true">▤</span>Meetings &amp; agendas</a>
+          <a class="tile" href="#explore"><span aria-hidden="true">⌖</span>Explore the map</a>
+        </div>
+        <p class="script">Real people. Real places. Our Estero.</p>
+      </div>
+    </section>
+  </main>
 </div>
+
+<footer class="footer">
+  <div class="footer-in">
+    <div class="foot-brand"><img src="assets/engage-estero-logo.png" alt="Engage Estero" width="120" height="51"><span>Inform · Explore · Shape</span></div>
+    <p class="foot-quote">Better information. Stronger decisions. A brighter future for Estero.</p>
+    <div class="foot-small">
+      <span id="foot"></span>
+      <span>Source: Village of Estero Council and Planning Zoning &amp; Design Board minutes, processed by the EagleGIS team. Maps and points load live from the Engage Estero ArcGIS layer.</span>
+      <span>Photos: Leo_Visions, Jacob Padilla, Hansjörg Keller, Florida-Guidebook.com and Wes Hicks on Unsplash. Waterfront photo from Engage Estero. Unsplash photos are stand-ins, not taken in Estero.</span>
+    </div>
+  </div>
+</footer>
 
 <script src="https://js.arcgis.com/4.31/"></script>
 <script src="app.js"></script>
+<script>
+// chapter rail + nav state
+(function(){
+  const links=[...document.querySelectorAll('#rail a')];
+  const secs=links.map(a=>document.getElementById(a.dataset.sec)).filter(Boolean);
+  const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle('on',a.dataset.sec===e.target.id))}})},{rootMargin:'-45% 0px -50% 0px'});
+  secs.forEach(s=>io.observe(s));
+  const nav=document.getElementById('topnav');
+  const onScroll=()=>nav.classList.toggle('solid',scrollY>40);
+  addEventListener('scroll',onScroll,{passive:true});onScroll();
+})();
+</script>
 </body>
 </html>
