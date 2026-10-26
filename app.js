@@ -146,6 +146,7 @@ function whenNear(el, fn) {
   $("facts").innerHTML = [[R.length.toLocaleString(), "agenda items"], [new Set(R.map(r => r.url)).size, "meetings"], [live.length, "mapped to a place"], [R.filter(r => r.out === 0).length.toLocaleString(), "approved"], [`${years[0]}–${String(years[years.length - 1]).slice(2)}`, "years covered"]]
     .map(f => `<div><b>${f[0]}</b><span>${f[1]}</span></div>`).join("");
   $("foot").textContent = `Snapshot through ${fmtDate(R[R.length - 1].date)}.`;
+  if ($("mapKey")) $("mapKey").innerHTML = window.WED.sym.legendHTML();
 
   try { Esri = await loadEsri(); }
   catch (e) { document.querySelectorAll(".map").forEach(m => m.innerHTML = '<div class="map-loading">Map library could not load.</div>'); setBadge("off", "Maps could not load"); return; }

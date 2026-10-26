@@ -201,3 +201,19 @@ input[type=range]{width:100%;accent-color:var(--forest)}
 
 .map .esri-attribution{font-size:10px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+
+/* ---------- project symbology: swatches, map key, sample tag ---------- */
+.sym{flex:none;vertical-align:middle}
+.cat-dot{display:inline-block;border-radius:50%;flex:none;vertical-align:middle}
+.sample-tag{display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--wait);border:1px dashed currentColor;border-radius:4px;padding:1px 6px;white-space:nowrap}
+.mapkey{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px 18px}
+.mapkey summary{cursor:pointer;font-weight:700;padding:10px 0;list-style-position:inside}
+.mapkey h4{margin:0 0 6px;font-family:var(--body);font-size:.74rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.mapkey ul{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+.mapkey li{display:flex;align-items:center;gap:8px;font-size:.88rem}
+.mapkey li .sym+.sym{margin-left:-2px}
+.key-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;padding:4px 0 14px;border-bottom:1px solid var(--line)}
+.key-cat-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;padding:12px 0 14px}
+.key-cat-wrap>h4{grid-column:1/-1;margin:0}
+.key-cats b{display:block;font-size:.85rem;margin-bottom:6px}
+.key-note{font-size:.85rem;color:var(--muted);padding:0 0 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
