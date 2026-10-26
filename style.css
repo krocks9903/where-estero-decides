@@ -317,3 +317,4 @@ input[type=range]{width:100%;accent-color:var(--forest)}
 .sp-status{font-size:.8rem;color:var(--muted)}
 .sp-src{font-size:.82rem!important;color:var(--muted)}
 .sp-src a{font-weight:600}
+.doors-intro{display:grid;gap:4px;margin-bottom:-12px}
