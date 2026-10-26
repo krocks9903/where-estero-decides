@@ -1,0 +1,957 @@
+{
+ "type": "FeatureCollection",
+ "name": "estero_projects",
+ "meta": {
+  "schema_version": 1,
+  "updated": "2026-10-26",
+  "sample": true,
+  "note": "SAMPLE DATA. Project names and linked decisions are real records from Village minutes. Sponsor group, category, status, stage and fiscal years are placeholders for layout and symbology, not verified. No costs are included."
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "id": "VOE-RD-01",
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      -81.7946,
+      26.4204
+     ],
+     [
+      -81.7946,
+      26.4258
+     ],
+     [
+      -81.7945,
+      26.431
+     ]
+    ]
+   },
+   "properties": {
+    "project_id": "VOE-RD-01",
+    "name": "River Ranch Road Improvements",
+    "sponsor_group": "village",
+    "category": "Roadway",
+    "dev_type": null,
+    "status": "funded_this_fy",
+    "stage": "design",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [
+     "FY2026"
+    ],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Village Council",
+    "decision_ids": [
+     "vc:2498",
+     "vc:2515",
+     "vc:2599"
+    ],
+    "source_urls": [],
+    "location_name": "River Ranch Rd, Williams Rd to Corkscrew Rd",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": false
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "VOE-INT-01",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -81.798178,
+     26.422301
+    ]
+   },
+   "properties": {
+    "project_id": "VOE-INT-01",
+    "name": "Williams Road at Estero High School Turn Lane",
+    "sponsor_group": "village",
+    "category": "Intersection",
+    "dev_type": null,
+    "status": "planned_5yr",
+    "stage": "design",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [
+     "FY2028"
+    ],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Village Council",
+    "decision_ids": [
+     "vc:2289",
+     "vc:2584"
+    ],
+    "source_urls": [],
+    "location_name": "Williams Rd at Estero High School",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": false
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "VOE-BP-01",
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      -81.8049,
+      26.4314
+     ],
+     [
+      -81.8049,
+      26.4366
+     ],
+     [
+      -81.8061,
+      26.4406
+     ]
+    ]
+   },
+   "properties": {
+    "project_id": "VOE-BP-01",
+    "name": "Sandy Lane & Broadway East Bicycle/Pedestrian Improvements",
+    "sponsor_group": "village",
+    "category": "Bicycle and Pedestrian",
+    "dev_type": null,
+    "status": "funded_this_fy",
+    "stage": "construction",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [
+     "FY2026"
+    ],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Village Council",
+    "decision_ids": [
+     "vc:177",
+     "vc:399",
+     "vc:1468"
+    ],
+    "source_urls": [],
+    "location_name": "Sandy Ln and Broadway Ave E",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": false
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "VOE-LB-01",
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      -81.8128,
+      26.4106
+     ],
+     [
+      -81.8119,
+      26.4252
+     ],
+     [
+      -81.8095,
+      26.4326
+     ],
+     [
+      -81.8085,
+      26.442
+     ]
+    ]
+   },
+   "properties": {
+    "project_id": "VOE-LB-01",
+    "name": "US 41 Median Landscaping",
+    "sponsor_group": "village",
+    "category": "Landscaping and Beautification",
+    "dev_type": null,
+    "status": "planned_5yr",
+    "stage": "construction",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [
+     "FY2027",
+     "FY2028"
+    ],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Village Council",
+    "decision_ids": [
+     "vc:689",
+     "vc:1448",
+     "vc:1905",
+     "vc:197",
+     "vc:470"
+    ],
+    "source_urls": [],
+    "location_name": "US 41 / Tamiami Trl",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": false
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "VOE-PR-01",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -81.80460000000001,
+       26.4203
+      ],
+      [
+       -81.7994,
+       26.4203
+      ],
+      [
+       -81.7994,
+       26.424699999999998
+      ],
+      [
+       -81.80460000000001,
+       26.424699999999998
+      ],
+      [
+       -81.80460000000001,
+       26.4203
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "project_id": "VOE-PR-01",
+    "name": "Estero Sports Park",
+    "sponsor_group": "village",
+    "category": "Parks and Recreation",
+    "dev_type": null,
+    "status": "funded_this_fy",
+    "stage": "design",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [
+     "FY2026"
+    ],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Village Council",
+    "decision_ids": [
+     "vc:2031",
+     "vc:1704",
+     "pzdb:2218"
+    ],
+    "source_urls": [],
+    "location_name": "N of Williams Rd, E of Via Coconut Point",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": true
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "VOE-ST-01",
+   "geometry": null,
+   "properties": {
+    "project_id": "VOE-ST-01",
+    "name": "Stormwater Master Plan",
+    "sponsor_group": "village",
+    "category": "Stormwater",
+    "dev_type": null,
+    "status": "not_in_plan",
+    "stage": "study",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Village Council",
+    "decision_ids": [
+     "vc:2182",
+     "vc:304"
+    ],
+    "source_urls": [],
+    "location_name": "Village-wide",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": false
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "VOE-UT-01",
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      -81.8095,
+      26.449
+     ],
+     [
+      -81.8034,
+      26.4488
+     ],
+     [
+      -81.7963,
+      26.4492
+     ],
+     [
+      -81.7889,
+      26.4494
+     ]
+    ]
+   },
+   "properties": {
+    "project_id": "VOE-UT-01",
+    "name": "Water and Sewer Expansion, Estero Parkway",
+    "sponsor_group": "village",
+    "category": "Utility",
+    "dev_type": null,
+    "status": "planned_5yr",
+    "stage": "design",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [
+     "FY2029"
+    ],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Village Council",
+    "decision_ids": [
+     "vc:2378",
+     "vc:2418",
+     "vc:2542",
+     "vc:1197"
+    ],
+    "source_urls": [],
+    "location_name": "Estero Pkwy",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": false
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "VOE-LA-01",
+   "geometry": null,
+   "properties": {
+    "project_id": "VOE-LA-01",
+    "name": "Right-of-Way Acquisition Services",
+    "sponsor_group": "village",
+    "category": "Land Acquisition",
+    "dev_type": null,
+    "status": "not_in_plan",
+    "stage": "contract",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Village Council",
+    "decision_ids": [
+     "vc:6",
+     "vc:195",
+     "vc:196",
+     "vc:591",
+     "vc:1969"
+    ],
+    "source_urls": [],
+    "location_name": "Several corridors",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": false
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "VOE-BF-01",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -81.79928,
+     26.430491
+    ]
+   },
+   "properties": {
+    "project_id": "VOE-BF-01",
+    "name": "Village Hall Second Floor Remodel",
+    "sponsor_group": "village",
+    "category": "Building Facilities",
+    "dev_type": null,
+    "status": "not_in_plan",
+    "stage": "complete",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Village Council",
+    "decision_ids": [
+     "vc:2160"
+    ],
+    "source_urls": [],
+    "location_name": "9401 Corkscrew Palms Cir",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": false
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "CS-CR-01",
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      -81.774,
+      26.4343
+     ],
+     [
+      -81.762,
+      26.438
+     ],
+     [
+      -81.75,
+      26.4439
+     ]
+    ]
+   },
+   "properties": {
+    "project_id": "CS-CR-01",
+    "name": "Corkscrew Road Widening",
+    "sponsor_group": "county_state",
+    "category": "County roads",
+    "dev_type": null,
+    "status": "planned_5yr",
+    "stage": "construction",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [
+     "FY2027"
+    ],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Village Council",
+    "decision_ids": [
+     "vc:929",
+     "vc:2457",
+     "vc:704"
+    ],
+    "source_urls": [],
+    "location_name": "Corkscrew Rd east of I-75",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": false
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "CS-FDOT-01",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -81.814696,
+     26.434255
+    ]
+   },
+   "properties": {
+    "project_id": "CS-FDOT-01",
+    "name": "US 41 Traffic Signal Maintenance (FDOT)",
+    "sponsor_group": "county_state",
+    "category": "FDOT",
+    "dev_type": null,
+    "status": "not_in_plan",
+    "stage": "agreement",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Village Council",
+    "decision_ids": [
+     "vc:160"
+    ],
+    "source_urls": [],
+    "location_name": "US 41 / Tamiami Trl",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": false
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "CS-2020-01",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -81.82310000000001,
+       26.4348
+      ],
+      [
+       -81.8203,
+       26.4348
+      ],
+      [
+       -81.8203,
+       26.4372
+      ],
+      [
+       -81.82310000000001,
+       26.4372
+      ],
+      [
+       -81.82310000000001,
+       26.4348
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "project_id": "CS-2020-01",
+    "name": "Conservation 20/20: 10 Acres on the Estero River",
+    "sponsor_group": "county_state",
+    "category": "Conservation 20/20",
+    "dev_type": null,
+    "status": "not_in_plan",
+    "stage": "discussion",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Village Council",
+    "decision_ids": [
+     "vc:2270"
+    ],
+    "source_urls": [],
+    "location_name": "Estero River",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": true
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "PVT-RES-01",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -81.80720000000001,
+       26.438
+      ],
+      [
+       -81.8044,
+       26.438
+      ],
+      [
+       -81.8044,
+       26.4404
+      ],
+      [
+       -81.80720000000001,
+       26.4404
+      ],
+      [
+       -81.80720000000001,
+       26.438
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "project_id": "PVT-RES-01",
+    "name": "Mayfair Village / Broadway Crossing",
+    "sponsor_group": "private",
+    "category": "Residential",
+    "dev_type": "Residential",
+    "status": "proposed",
+    "stage": "approved",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Village Council",
+    "decision_ids": [
+     "vc:912",
+     "vc:1044",
+     "pzdb:1494"
+    ],
+    "source_urls": [],
+    "location_name": "Between Broadway Ave E and Sandy Ln",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": true
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "PVT-COM-01",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -81.8183,
+       26.4498
+      ],
+      [
+       -81.8159,
+       26.4498
+      ],
+      [
+       -81.8159,
+       26.451800000000002
+      ],
+      [
+       -81.8183,
+       26.451800000000002
+      ],
+      [
+       -81.8183,
+       26.4498
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "project_id": "PVT-COM-01",
+    "name": "Walmart Expansion",
+    "sponsor_group": "private",
+    "category": "Commercial/retail",
+    "dev_type": "Commercial/retail",
+    "status": "under_construction",
+    "stage": "approved",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Planning Zoning & Design Board",
+    "decision_ids": [
+     "pzdb:1767",
+     "pzdb:224"
+    ],
+    "source_urls": [],
+    "location_name": "19975 S Tamiami Trl",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": true
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "PVT-COM-02",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -81.786333,
+     26.430139
+    ]
+   },
+   "properties": {
+    "project_id": "PVT-COM-02",
+    "name": "Firestone Rezoning, Estero Town Center",
+    "sponsor_group": "private",
+    "category": "Commercial/retail",
+    "dev_type": "Commercial/retail",
+    "status": "proposed",
+    "stage": "denied",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Village Council",
+    "decision_ids": [
+     "vc:1697",
+     "vc:1698",
+     "vc:2073",
+     "vc:2136",
+     "vc:2207",
+     "vc:149",
+     "vc:297"
+    ],
+    "source_urls": [],
+    "location_name": "Estero Town Commons Pl",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": false
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "PVT-MU-01",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -81.8095,
+       26.4418
+      ],
+      [
+       -81.80550000000001,
+       26.4418
+      ],
+      [
+       -81.80550000000001,
+       26.446199999999997
+      ],
+      [
+       -81.8095,
+       26.446199999999997
+      ],
+      [
+       -81.8095,
+       26.4418
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "project_id": "PVT-MU-01",
+    "name": "Downtown Estero",
+    "sponsor_group": "private",
+    "category": "Mixed use",
+    "dev_type": "Mixed use",
+    "status": "under_construction",
+    "stage": "approved",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Planning Zoning & Design Board",
+    "decision_ids": [
+     "pzdb:1982",
+     "pzdb:350",
+     "pzdb:372",
+     "pzdb:553",
+     "pzdb:554",
+     "pzdb:229"
+    ],
+    "source_urls": [],
+    "location_name": "E of US 41, N of Broadway Ave E",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": true
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "PVT-MU-02",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -81.81739999999999,
+       26.400000000000002
+      ],
+      [
+       -81.8126,
+       26.400000000000002
+      ],
+      [
+       -81.8126,
+       26.4044
+      ],
+      [
+       -81.81739999999999,
+       26.4044
+      ],
+      [
+       -81.81739999999999,
+       26.400000000000002
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "project_id": "PVT-MU-02",
+    "name": "Woodfield Estero",
+    "sponsor_group": "private",
+    "category": "Mixed use",
+    "dev_type": "Mixed use",
+    "status": "proposed",
+    "stage": "approved",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Village Council",
+    "decision_ids": [
+     "pzdb:272",
+     "pzdb:970",
+     "pzdb:971",
+     "vc:1078",
+     "vc:1143",
+     "pzdb:231"
+    ],
+    "source_urls": [],
+    "location_name": "NW corner of US 41 and Coconut Rd",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": true
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "PVT-HOS-01",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -81.808611,
+     26.403278
+    ]
+   },
+   "properties": {
+    "project_id": "PVT-HOS-01",
+    "name": "Home2 Suites",
+    "sponsor_group": "private",
+    "category": "Hospitality",
+    "dev_type": "Hospitality",
+    "status": "proposed",
+    "stage": "review",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Planning Zoning & Design Board",
+    "decision_ids": [
+     "pzdb:2226",
+     "pzdb:2219"
+    ],
+    "source_urls": [],
+    "location_name": "Via Coconut Point",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": false
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "PVT-MED-01",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -81.78569999999999,
+       26.435399999999998
+      ],
+      [
+       -81.7833,
+       26.435399999999998
+      ],
+      [
+       -81.7833,
+       26.4378
+      ],
+      [
+       -81.78569999999999,
+       26.4378
+      ],
+      [
+       -81.78569999999999,
+       26.435399999999998
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "project_id": "PVT-MED-01",
+    "name": "AAAA PreK-8 School, Three Oaks Parkway",
+    "sponsor_group": "private",
+    "category": "Medical/institutional/education",
+    "dev_type": "Medical/institutional/education",
+    "status": "complete",
+    "stage": "approved",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Planning Zoning & Design Board",
+    "decision_ids": [
+     "pzdb:1546",
+     "pzdb:1776"
+    ],
+    "source_urls": [],
+    "location_name": "20897 Three Oaks Pkwy",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": true
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "PVT-OTH-01",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -81.73116,
+     26.450583
+    ]
+   },
+   "properties": {
+    "project_id": "PVT-OTH-01",
+    "name": "Bella Terra Cell Tower",
+    "sponsor_group": "private",
+    "category": "Other",
+    "dev_type": "Other",
+    "status": "complete",
+    "stage": "approved",
+    "total_cost": null,
+    "budget_5yr": null,
+    "fiscal_years": [],
+    "funding_sources": [],
+    "units": null,
+    "nonres_sqft": null,
+    "deciding_body": "Village Council",
+    "decision_ids": [
+     "vc:473",
+     "vc:593",
+     "vc:657"
+    ],
+    "source_urls": [],
+    "location_name": "19980 Bella Terra Blvd",
+    "sample": true,
+    "verified": false,
+    "geometry_approx": false
+   }
+  }
+ ]
+}
