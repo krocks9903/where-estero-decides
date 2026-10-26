@@ -72,6 +72,7 @@
       this.snapshot = { cats: dj.cats, types: dj.types, rows };
       this.decisions = rows;
       this.decisionsById = new Map(rows.map(d => [d.rid, d]));
+      this.ridByKey = new Map(rows.map(d => [`${d.date}|${d.typeName}|${d.no}`, d.rid]));
       const ys = rows.map(r => r.year);
       this.yearSpan = [Math.min(...ys), Math.max(...ys)];
 
@@ -168,6 +169,9 @@
       });
       return c;
     },
+
+    /** RecordId for a live-layer row (date + board + item number is unique in the records). */
+    ridFor(date, type, no) { return this.ridByKey.get(`${date}|${type}|${no}`) || null; },
 
     groupOf(id) { return TAXONOMY.groups.find(g => g.id === id) || null; },
     statusLabel(s) { return TAXONOMY.status[s] || s || "Unknown"; },

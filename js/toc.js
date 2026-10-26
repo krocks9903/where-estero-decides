@@ -93,6 +93,58 @@
       </li>`;
     }).join("");
     renderCrumbs();
+    renderLoneDecision();
+  }
+
+  /** A decision that isn't linked to any project yet still gets a card, so side doors always land somewhere. */
+  function renderLoneDecision() {
+    const box = document.getElementById("tocDecision"); if (!box) return;
+    const st = store.state, d = st.decision && !st.project && store.decisionsById.get(st.decision);
+    if (!d) { box.hidden = true; box.innerHTML = ""; return; }
+    const docs = store.docsFor(d).map(doc => `<a class="doc" href="${esc(doc.url)}" target="_blank" rel="noopener">${esc(doc.kind)}${d.no ? `, item ${d.no}` : ""} <span aria-hidden="true">↗</span></a>`).join("");
+    box.hidden = false;
+    box.innerHTML = `<div class="lone-head"><span class="eyebrow">Decision</span><button class="lone-x" data-act="clear-decision" aria-label="Close decision">×</button></div>
+      <p class="d-meta">${fmtDate(d.date)} · ${esc(BODY[d.typeName] || d.typeName)} <span class="pill o${d.out}">${esc(d.status)}</span></p>
+      <p class="lone-what">${esc(what(d))}</p>
+      ${d.loc ? `<p class="d-meta">${esc(d.loc)}</p>` : ""}
+      ${docs ? `<div class="docs">${docs}</div>` : ""}
+      <p class="p-note">Not linked to a project in the data yet.</p>`;
+  }
+
+  /** Open something in the contents: { project } or { decision } (a RecordId). Widens the year range if needed. */
+  function focus({ project, decision, group, category } = {}, opts = {}) {
+    const patch = {};
+    const d = decision && store.decisionsById.get(decision);
+    let p = project && store.projectsById.get(project);
+    if (d && !p) p = store.projectsForDecision(d.rid)[0] || null;
+    if (p) Object.assign(patch, { group: p.sponsor_group, category: p.category, project: p.project_id });
+    else Object.assign(patch, { group: group || null, category: category || null, project: null });
+    patch.decision = d ? d.rid : null;
+    if (d && !store.yearInRange(d.year)) Object.assign(patch, { from: Math.min(store.state.from, d.year), to: Math.max(store.state.to, d.year) });
+    if (p) { const off = new Set(store.state.off); off.delete("g:" + p.sponsor_group); off.delete("c:" + p.sponsor_group + "|" + p.category); patch.off = off; }
+    store.set(patch, opts.source || "focus");
+    if (opts.scroll !== false) {
+      const target = document.getElementById(opts.scrollTo || "explore");
+      target && target.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+      const panel = document.getElementById("tocPanel");
+      if (panel && !panel.classList.contains("toc-open") && matchMedia("(max-width: 860px)").matches) document.getElementById("tocToggle")?.click();
+    }
+    return !!(p || d);
+  }
+
+  /* ---------- deep links: #project=VOE-RD-01  #decision=vc:297 ---------- */
+  function readHash() {
+    const m = location.hash.match(/^#(project|decision)=([^&]+)$/);
+    if (!m) return false;
+    const id = decodeURIComponent(m[2]);
+    return focus(m[1] === "project" ? { project: id } : { decision: id }, { source: "hash" });
+  }
+  function writeHash(state) {
+    const enc = s => encodeURIComponent(s).replace(/%3A/gi, ":");
+    const h = state.decision ? "#decision=" + enc(state.decision) : state.project ? "#project=" + enc(state.project) : "";
+    if (h === location.hash) return;
+    if (!h && !/^#(project|decision)=/.test(location.hash)) return;
+    history.replaceState(null, "", location.pathname + location.search + h);
   }
 
   function renderCrumbs() {
@@ -148,12 +200,15 @@
     root.addEventListener("click", onClick);
     root.addEventListener("change", onVis);
     crumbs && crumbs.addEventListener("click", e => { const b = e.target.closest("button[data-act]"); if (b) select(b.dataset.act, b); });
+    const lone = document.getElementById("tocDecision");
+    lone && lone.addEventListener("click", e => { if (e.target.closest("[data-act=clear-decision]")) store.set({ decision: null }, "toc"); });
     store.on("change", ({ state, prev }) => {
       // a fresh selection re-opens its branch even if the user collapsed it earlier
       if (state.group !== prev.group && state.group) closed.delete(keyG(state.group));
       if (state.category !== prev.category && state.category) closed.delete(keyC(state.group, state.category));
       if (state.project !== prev.project && state.project) closed.delete(keyP(state.project));
       render();
+      writeHash(state);
       if (state.project && state.project !== prev.project) {
         const node = root.querySelector(`[data-key="${keyP(state.project).replace(/"/g, '\\"')}"]`);
         node && node.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
@@ -163,8 +218,10 @@
     const tog = opts.toggle && document.getElementById(opts.toggle), panel = opts.panel && document.getElementById(opts.panel);
     if (tog && panel) tog.addEventListener("click", () => { const o = panel.classList.toggle("toc-open"); tog.setAttribute("aria-expanded", o); tog.textContent = o ? "Hide contents" : "Browse contents"; });
     render();
+    readHash();
+    addEventListener("hashchange", readHash);
   }
 
   window.WED = window.WED || {};
-  window.WED.toc = { init, render, kindOf };
+  window.WED.toc = { init, render, kindOf, focus };
 })();

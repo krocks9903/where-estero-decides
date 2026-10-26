@@ -93,7 +93,8 @@ async function loadLive() {
       out.push({
         oid: a.ObjectId, date, year: a.MeetingYear || +date.slice(0, 4), catName: a.LayerCategory, out: outOf(a.Status),
         typeName: a.MeetingType, title: shortTitle(a.ProjectName, a.ProjectTitle), action: trimAction(a.ActionTaken || a.Outcome),
-        loc: cleanLoc(a.LocationName), lat: a.Latitude, lng: a.Longitude, url: a.Document_Link, no: a.AgendaItemNumber, status: a.Status || "Unknown"
+        loc: cleanLoc(a.LocationName), lat: a.Latitude, lng: a.Longitude, url: a.Document_Link, no: a.AgendaItemNumber, status: a.Status || "Unknown",
+        rid: window.WED.store.ridFor(date, a.MeetingType, a.AgendaItemNumber)
       });
     });
     if (feats.length < 1000 && !j.exceededTransferLimit) break;
@@ -258,6 +259,8 @@ async function explore(snap) {
     const p = state.project && S.projectsById.get(state.project);
     if (p) S.decisionsFor(p).filter(d => d.lat != null).forEach(d =>
       proj.hl.add(dot(d, outColor(d.out), d.rid === state.decision ? 15 : 10)));
+    const lone = !p && state.decision && S.decisionsById.get(state.decision);
+    if (lone && lone.lat != null) proj.hl.add(dot(lone, outColor(lone.out), 15));
     const moved = !prev || state.group !== prev.group || state.category !== prev.category || state.project !== prev.project || state.decision !== prev.decision;
     if (!moved) return;
     const d = state.decision && S.decisionsById.get(state.decision);
