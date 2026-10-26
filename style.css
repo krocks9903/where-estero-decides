@@ -26,6 +26,7 @@
   --c0:#f29a5e; --c1:#7fa9ec; --c2:#93a39c; --c3:#4fcaa8; --c4:#ee86a5; --c5:#a68ff0; --c6:#e9c25a; --c7:#9ccb67; color-scheme:dark}
 
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{scroll-behavior:smooth;scroll-padding-top:76px}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55}
 img{max-width:100%}
