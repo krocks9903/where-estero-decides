@@ -64,21 +64,32 @@
       <div class="chapter-head plain">
         <span class="eyebrow"><b>01</b> Explore the map</span>
         <h2>See what's happening across Estero</h2>
-        <p>This is the live EagleGIS web map. Turn categories on and off, filter by outcome, board or year, or search a street name. Click a point or cluster to read it.</p>
+        <p>Browse by who sponsors a project, then its category, the project itself, the decisions made on it and the documents behind them. Check or uncheck a layer to show or hide it. The map also shows every decision in the live EagleGIS records.</p>
       </div>
       <div class="stage">
         <div class="map" id="mapExplore" role="region" aria-label="Map of mapped decisions"></div>
-        <div class="panel filters">
-          <div class="summary"><span class="big" id="fCount">0</span><span class="muted" id="fSub"></span></div>
-          <div class="fgrid">
-            <label class="wide">Search<input type="search" id="fSearch" placeholder="Corkscrew, Walmart, sidewalk…"></label>
-            <label>Outcome<select id="fOut"><option value="">All outcomes</option></select></label>
-            <label>Board<select id="fType"><option value="">All boards</option></select></label>
-            <label>From<select id="fFrom"></select></label>
-            <label>To<select id="fTo"></select></label>
+        <div class="panel toc-panel" id="tocPanel">
+          <div class="toc-head">
+            <span class="eyebrow">Contents</span>
+            <div class="crumbs" id="tocCrumbs"></div>
+            <div class="years" role="group" aria-label="Year range">
+              <label>From<select id="fFrom"></select></label>
+              <label>To<select id="fTo"></select></label>
+            </div>
+            <button class="toc-toggle" id="tocToggle" aria-expanded="false" aria-controls="toc">Browse contents</button>
           </div>
-          <div class="legend" id="legend" role="group" aria-label="Category layers"></div>
-          <div class="row"><button id="fReset">Clear all</button></div>
+          <ul class="toc" id="toc" role="tree" aria-label="Projects by sponsor and category"></ul>
+          <details class="dfilters">
+            <summary>Decision filters <span class="muted" id="fMeta" hidden>· <span id="fCount"></span> <span id="fSub"></span></span></summary>
+            <div class="fgrid">
+              <label class="wide">Search<input type="search" id="fSearch" placeholder="Corkscrew, Walmart, sidewalk…"></label>
+              <label>Outcome<select id="fOut"><option value="">All outcomes</option></select></label>
+              <label>Board<select id="fType"><option value="">All boards</option></select></label>
+            </div>
+            <span class="eyebrow">Decision topics</span>
+            <div class="legend" id="legend" role="group" aria-label="Decision topic layers"></div>
+            <div class="row"><button id="fReset">Clear all filters</button></div>
+          </details>
         </div>
       </div>
       <div id="mapKey"></div>
@@ -173,6 +184,7 @@
 <script src="https://js.arcgis.com/4.31/"></script>
 <script src="js/store.js"></script>
 <script src="js/symbology.js"></script>
+<script src="js/toc.js"></script>
 <script src="app.js"></script>
 <script>
 // chapter rail + nav state

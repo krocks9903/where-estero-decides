@@ -108,10 +108,10 @@ function loadEsri() {
   return new Promise((resolve, reject) => {
     if (!window.require) return reject(new Error("ArcGIS SDK did not load"));
     require(["esri/config", "esri/Map", "esri/WebMap", "esri/views/MapView", "esri/Graphic", "esri/layers/GraphicsLayer",
-             "esri/geometry/Point", "esri/geometry/Polyline"],
-      (esriConfig, Map, WebMap, MapView, Graphic, GraphicsLayer, Point, Polyline) => {
+             "esri/geometry/Point", "esri/geometry/Polyline", "esri/layers/FeatureLayer", "esri/geometry/Extent"],
+      (esriConfig, Map, WebMap, MapView, Graphic, GraphicsLayer, Point, Polyline, FeatureLayer, Extent) => {
         esriConfig.portalUrl = CONFIG.portalUrl;
-        resolve({ Map, WebMap, MapView, Graphic, GraphicsLayer, Point, Polyline });
+        resolve({ Map, WebMap, MapView, Graphic, GraphicsLayer, Point, Polyline, FeatureLayer, Extent });
       }, reject);
   });
 }
@@ -147,6 +147,8 @@ function whenNear(el, fn) {
     .map(f => `<div><b>${f[0]}</b><span>${f[1]}</span></div>`).join("");
   $("foot").textContent = `Snapshot through ${fmtDate(R[R.length - 1].date)}.`;
   if ($("mapKey")) $("mapKey").innerHTML = window.WED.sym.legendHTML();
+  initYearRange();
+  window.WED.toc.init({ tree: "toc", crumbs: "tocCrumbs", toggle: "tocToggle", panel: "tocPanel" });
 
   try { Esri = await loadEsri(); }
   catch (e) { document.querySelectorAll(".map").forEach(m => m.innerHTML = '<div class="map-loading">Map library could not load.</div>'); setBadge("off", "Maps could not load"); return; }
@@ -158,25 +160,135 @@ function whenNear(el, fn) {
   whenNear($("mapGuess"), () => guess(live));
 })();
 
-/* ---------- 1 EXPLORE: the real web map ---------- */
+/* ---------- shared year range (Explore selects; the timeline writes the same store values) ---------- */
+function initYearRange() {
+  const S = window.WED.store, fFrom = $("fFrom"), fTo = $("fTo");
+  for (let y = S.yearSpan[0]; y <= S.yearSpan[1]; y++) { fFrom.add(new Option(y, y)); fTo.add(new Option(y, y)); }
+  const sync = () => { fFrom.value = S.state.from; fTo.value = S.state.to; };
+  sync();
+  fFrom.onchange = () => { const f = +fFrom.value; S.set({ from: f, to: Math.max(f, S.state.to) }, "years"); };
+  fTo.onchange = () => { const t = +fTo.value; S.set({ to: t, from: Math.min(t, S.state.from) }, "years"); };
+  S.on("change", ({ state, prev }) => { if (state.from !== prev.from || state.to !== prev.to) sync(); });
+}
+
+/* ---------- 1 EXPLORE: the real web map + the Projects layers ---------- */
+const PROJECT_FIELDS = [
+  { name: "oid", type: "oid" }, { name: "project_id", type: "string" }, { name: "name", type: "string" },
+  { name: "sponsor_group", type: "string" }, { name: "category", type: "string" }, { name: "status", type: "string" }, { name: "symkey", type: "string" }
+];
+
+function toEsriGeometry(g) {
+  if (!g) return null;
+  const sr = { wkid: 4326 };
+  if (g.type === "Point") return ["point", { type: "point", longitude: g.coordinates[0], latitude: g.coordinates[1], spatialReference: sr }];
+  if (g.type === "LineString") return ["polyline", { type: "polyline", paths: [g.coordinates], spatialReference: sr }];
+  if (g.type === "MultiLineString") return ["polyline", { type: "polyline", paths: g.coordinates, spatialReference: sr }];
+  if (g.type === "Polygon") return ["polygon", { type: "polygon", rings: g.coordinates, spatialReference: sr }];
+  if (g.type === "MultiPolygon") return ["polygon", { type: "polygon", rings: g.coordinates.flat(1), spatialReference: sr }];
+  return null;
+}
+
+function bboxOf(geoms) {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  const walk = c => { if (typeof c[0] === "number") { x0 = Math.min(x0, c[0]); x1 = Math.max(x1, c[0]); y0 = Math.min(y0, c[1]); y1 = Math.max(y1, c[1]); } else c.forEach(walk); };
+  geoms.filter(Boolean).forEach(g => walk(g.coordinates));
+  return isFinite(x0) ? { x0, y0, x1, y1 } : null;
+}
+
+const projectPopupHTML = p => {
+  if (!p) return "";
+  const S = window.WED.store, decs = S.decisionsFor(p, { inRange: false }), last = p.latest;
+  return `<p style="margin:0 0 6px">${esc(S.groupOf(p.sponsor_group)?.label || "")} · ${esc(p.category)}</p>` +
+    `<p style="margin:0 0 6px"><b>${esc(S.statusLabel(p.status))}</b>${p.stage ? " · " + esc(p.stage) : ""}${p.sample ? " · <i>sample data</i>" : ""}</p>` +
+    `<p style="margin:0 0 6px">${decs.length} linked decision${decs.length === 1 ? "" : "s"}${last ? `. Latest: ${fmtDate(last.date)}, ${esc(last.status)}` : ""}</p>` +
+    `<p style="margin:0">Open it in the Contents panel for decisions and documents.</p>`;
+};
+
+function addProjectLayers(view) {
+  const S = window.WED.store, sym = window.WED.sym;
+  const byType = { polygon: [], polyline: [], point: [] };
+  S.projects.forEach((p, i) => {
+    const eg = toEsriGeometry(p.geometry); if (!eg) return;
+    byType[eg[0]].push(new Esri.Graphic({ geometry: eg[1], attributes: {
+      oid: i + 1, project_id: p.project_id, name: p.name, sponsor_group: p.sponsor_group, category: p.category, status: p.status,
+      symkey: `${p.sponsor_group}|${p.category}|${p.status}` } }));
+  });
+  const statuses = g => g === "private" ? ["proposed", "under_construction", "complete"] : ["funded_this_fy", "planned_5yr", "not_in_plan"];
+  const layers = [];
+  ["polygon", "polyline", "point"].forEach(t => {
+    if (!byType[t].length) return;
+    const infos = [];
+    S.TAXONOMY.groups.forEach(g => g.categories.forEach(c => statuses(g.id).forEach(st =>
+      infos.push({ value: `${g.id}|${c}|${st}`, symbol: sym.arcgisSymbol({ sponsor_group: g.id, category: c, status: st }, t) }))));
+    layers.push(new Esri.FeatureLayer({
+      title: "Projects", source: byType[t], objectIdField: "oid", geometryType: t, spatialReference: { wkid: 4326 },
+      fields: PROJECT_FIELDS, outFields: ["*"], listMode: "hide",
+      renderer: { type: "unique-value", field: "symkey", uniqueValueInfos: infos,
+        defaultSymbol: sym.arcgisSymbol({ sponsor_group: "village", category: "Other", status: "not_in_plan" }, t) },
+      popupTemplate: { title: "{name}", content: f => projectPopupHTML(S.projectsById.get(f.graphic.attributes.project_id)) }
+    }));
+  });
+  view.map.addMany(layers);
+  const hl = new Esri.GraphicsLayer({ listMode: "hide" });
+  view.map.add(hl);
+  return { layers, hl };
+}
+
 async function explore(snap) {
-  const cats = snap.cats, types = snap.types;
+  const cats = snap.cats, types = snap.types, S = window.WED.store;
   const webmap = new Esri.WebMap({ portalItem: { id: CONFIG.webmapId } });
   const view = new Esri.MapView({ container: "mapExplore", map: webmap, navigation: { mouseWheelZoomEnabled: false }, popup: { dockEnabled: false } });
   try { await view.when(); }
   catch (e) { $("mapExplore").innerHTML = '<div class="map-loading">The web map could not load. Check that it is shared publicly.</div>'; return; }
   await webmap.loadAll();
   const layer = webmap.allLayers.find(l => l.type === "feature" && (l.title || "").includes(CONFIG.layerTitleHint)) || webmap.allLayers.find(l => l.type === "feature");
+
+  /* --- Projects: one dataset, filtered views (one layer per geometry type) --- */
+  let proj = null;
+  try { proj = addProjectLayers(view); } catch (e) { console.warn("[WED] Project layers failed", e); }
+  window.WED.exploreView = view;
+
+  function syncProjects(state, prev) {
+    if (!proj) return;
+    const vis = S.visibleProjects(), ids = vis.map(p => p.project_id);
+    const where = ids.length ? `project_id IN (${ids.map(sqlStr).join(",")})` : "1=0";
+    proj.layers.forEach(l => { l.definitionExpression = where; });
+    if (layer) layer.effect = state.project ? "opacity(35%) grayscale(70%)" : null;
+    proj.hl.removeAll();
+    const p = state.project && S.projectsById.get(state.project);
+    if (p) S.decisionsFor(p).filter(d => d.lat != null).forEach(d =>
+      proj.hl.add(dot(d, outColor(d.out), d.rid === state.decision ? 15 : 10)));
+    const moved = !prev || state.group !== prev.group || state.category !== prev.category || state.project !== prev.project || state.decision !== prev.decision;
+    if (!moved) return;
+    const d = state.decision && S.decisionsById.get(state.decision);
+    if (d && d.lat != null) return view.goTo({ center: [d.lng, d.lat], zoom: 16 }).catch(() => {});
+    const box = bboxOf(p ? [p.geometry, ...S.decisionsFor(p).filter(x => x.lat != null).map(x => ({ coordinates: [x.lng, x.lat] }))]
+                         : (state.group || state.category) ? vis.map(v => v.geometry) : []);
+    if (!box) return (state.group || state.category || p) ? null : view.goTo({ center: CONFIG.center, zoom: CONFIG.zoom }).catch(() => {});
+    if (box.x1 - box.x0 < 0.002 && box.y1 - box.y0 < 0.002) return view.goTo({ center: [(box.x0 + box.x1) / 2, (box.y0 + box.y1) / 2], zoom: 16 }).catch(() => {});
+    view.goTo(new Esri.Extent({ xmin: box.x0, ymin: box.y0, xmax: box.x1, ymax: box.y1, spatialReference: { wkid: 4326 } }).expand(1.4)).catch(() => {});
+  }
+  S.on("change", ({ state, prev }) => syncProjects(state, prev));
+  syncProjects(S.state, null);
+
+  // clicking a project on the map opens it in the contents
+  if (proj) view.on("click", async e => {
+    try {
+      const r = await view.hitTest(e, { include: proj.layers });
+      const hit = r.results.find(x => x.graphic && x.graphic.attributes && x.graphic.attributes.project_id);
+      if (hit) { const p = S.projectsById.get(hit.graphic.attributes.project_id); S.set({ group: p.sponsor_group, category: p.category, project: p.project_id }, "map"); }
+    } catch (err) { /* hit test is a nicety */ }
+  });
+
+  /* --- Decisions layer filters (unchanged behavior; years now come from the shared store) --- */
   if (!layer) return;
   await layer.load();
   const catField = layer.fields.some(f => f.name === "LayerCategory") ? "LayerCategory" : null;
 
-  const st = { cats: new Set(cats), out: "", type: "", from: years0(snap), to: yearsN(snap), q: "", shown: 15 };
-  const fOut = $("fOut"), fType = $("fType"), fFrom = $("fFrom"), fTo = $("fTo"), fSearch = $("fSearch");
+  const st = { cats: new Set(cats), out: "", type: "", q: "", shown: 15 };
+  const fOut = $("fOut"), fType = $("fType"), fSearch = $("fSearch");
   OUT_NAMES.forEach((o, i) => fOut.add(new Option(o, i)));
   types.forEach(t => fType.add(new Option(t, t)));
-  for (let y = st.from; y <= st.to; y++) { fFrom.add(new Option(y, y)); fTo.add(new Option(y, y)); }
-  fFrom.value = st.from; fTo.value = st.to;
 
   const legend = $("legend");
   cats.forEach((c, i) => {
@@ -195,7 +307,7 @@ async function explore(snap) {
       else w.push(`(Status IS NULL OR Status NOT IN (${OUT_STATUS.flat().map(sqlStr).join(",")}))`);
     }
     if (st.type) w.push(`MeetingType = ${sqlStr(st.type)}`);
-    w.push(`MeetingYear >= ${st.from} AND MeetingYear <= ${st.to}`);
+    w.push(`MeetingYear >= ${S.state.from} AND MeetingYear <= ${S.state.to}`);
     if (st.q) { const q = sqlStr("%" + st.q.toUpperCase() + "%"); w.push(`(UPPER(ProjectTitle) LIKE ${q} OR UPPER(ProjectName) LIKE ${q} OR UPPER(LocationName) LIKE ${q} OR UPPER(ActionTaken) LIKE ${q})`); }
     return w.join(" AND ") || "1=1";
   }
@@ -212,7 +324,7 @@ async function explore(snap) {
       ]);
       if (my !== seq) return;
       $("fCount").textContent = count.toLocaleString();
-      $("fSub").textContent = "mapped items match";
+      $("fSub").textContent = "decisions on the map"; $("fMeta").hidden = false;
       if (stats) {
         const cc = Object.fromEntries(stats.features.map(f => [f.attributes[catField], f.attributes.n]));
         const mx = Math.max(1, ...Object.values(cc));
@@ -234,16 +346,16 @@ async function explore(snap) {
       $("more").hidden = count <= st.shown;
     } catch (e) { console.warn(e); $("fSub").textContent = "Filter failed. Try again."; }
   }
+  S.on("change", ({ state, prev }) => { if (state.from !== prev.from || state.to !== prev.to) { st.shown = 15; apply(); } });
   fOut.onchange = () => { st.out = fOut.value; st.shown = 15; apply(); };
   fType.onchange = () => { st.type = fType.value; st.shown = 15; apply(); };
-  fFrom.onchange = () => { st.from = +fFrom.value; if (st.from > st.to) { st.to = st.from; fTo.value = st.to; } apply(); };
-  fTo.onchange = () => { st.to = +fTo.value; if (st.to < st.from) { st.from = st.to; fFrom.value = st.from; } apply(); };
   let qT; fSearch.oninput = () => { clearTimeout(qT); qT = setTimeout(() => { st.q = fSearch.value.trim(); st.shown = 15; apply(); }, 250); };
   $("more").onclick = () => { st.shown += 30; apply(); };
   $("fReset").onclick = () => {
-    st.cats = new Set(cats); st.out = ""; st.type = ""; st.from = years0(snap); st.to = yearsN(snap); st.q = ""; st.shown = 15;
-    fOut.value = ""; fType.value = ""; fFrom.value = st.from; fTo.value = st.to; fSearch.value = "";
-    legend.querySelectorAll("input").forEach(i => i.checked = true); apply();
+    st.cats = new Set(cats); st.out = ""; st.type = ""; st.q = ""; st.shown = 15;
+    fOut.value = ""; fType.value = ""; fSearch.value = "";
+    legend.querySelectorAll("input").forEach(i => i.checked = true);
+    S.reset("reset"); apply();
   };
   apply();
 }

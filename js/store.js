@@ -36,7 +36,7 @@
     projectsByDecision: new Map(),
     snapshot: null,        // same shape the original app.js used: { cats, types, rows }
     yearSpan: [2015, 2026],
-    state: { group: null, category: null, project: null, decision: null, from: null, to: null },
+    state: { group: null, category: null, project: null, decision: null, from: null, to: null, off: new Set() },  // off: hidden layer keys "g:<group>" / "c:<group>|<category>"
 
     on(evt, fn) { (listeners[evt] = listeners[evt] || []).push(fn); return () => { listeners[evt] = listeners[evt].filter(f => f !== fn); }; },
 
@@ -52,7 +52,7 @@
       emit("change", { state: s, prev, source });
     },
 
-    reset(source) { this.set({ group: null, category: null, project: null, decision: null, from: this.yearSpan[0], to: this.yearSpan[1] }, source); },
+    reset(source) { this.set({ group: null, category: null, project: null, decision: null, from: this.yearSpan[0], to: this.yearSpan[1], off: new Set() }, source); },
 
     async load(base = "") {
       const [pj, dj] = await Promise.all([
@@ -121,9 +121,13 @@
       return p.decisions.some(d => this.yearInRange(d.year, st)) || p.fyYears.some(y => this.yearInRange(y, st));
     },
 
-    /** Projects that match group / category / project selection and the time filter. */
+    /** Layer switched off in the sidebar? */
+    isHidden(p, st = this.state) { return !!st.off && (st.off.has("g:" + p.sponsor_group) || st.off.has("c:" + p.sponsor_group + "|" + p.category)); },
+
+    /** Projects that match group / category / project selection, layer visibility and the time filter. */
     visibleProjects(st = this.state) {
       return this.projects.filter(p =>
+        !this.isHidden(p, st) &&
         (!st.group || p.sponsor_group === st.group) &&
         (!st.category || p.category === st.category) &&
         (!st.project || p.project_id === st.project) &&
