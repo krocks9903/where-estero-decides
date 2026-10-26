@@ -285,3 +285,12 @@ input[type=range]{width:100%;accent-color:var(--forest)}
 .door{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:8px;align-items:center;text-align:left;padding:8px 12px;background:var(--bg)}
 .door small{color:var(--muted);font-size:.76rem;white-space:nowrap}
 .door:hover{border-color:var(--green);background:var(--green-soft)}
+
+/* ---------- council: body + outcome ---------- */
+.progress span.done{background:var(--green)}
+.facts-dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;align-items:center}
+.facts-dl dt{font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.facts-dl dd{margin:0;font-weight:600}
+.case-sum{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.case-sum li{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;font-size:.92rem}
+.case-sum .pill{margin-top:3px}

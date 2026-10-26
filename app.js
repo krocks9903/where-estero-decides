@@ -28,13 +28,15 @@ const ROADS = {
   "Three Oaks Pkwy": [[26.4050,-81.7850],[26.4131,-81.7857],[26.4204,-81.7884],[26.4265,-81.7888],[26.4312,-81.7885],[26.4400,-81.7888],[26.4494,-81.7889]]
 };
 
+// Five real cases. Framed around the deciding body and the outcome only (no vote counts).
 const CASES = [
-  { rid: "vc:297", q: "Rezone part of Estero Town Center so a Firestone auto care shop can open?", ctx: "The request would amend the zoning for the Estero Town Center planned development. It had already been continued twice.", ans: 1, then: "Denied. Council rejected the zoning change for the Firestone shop." },
-  { rid: "pzdb:558", q: "Change the zoning rules to allow new signage at Miromar Outlets?", ctx: "The Planning Zoning & Design Board weighed a zoning amendment for the outlet mall's signs.", ans: 1, then: "The motion failed on a 4–4 tie. The Council later passed the related ordinance in June 2022." },
-  { rid: "vc:593", q: "Approve a cell tower on Bella Terra Blvd at its public hearing?", ctx: "Second reading and public hearing for the ordinance that would allow the tower.", ans: 2, then: "Continued to May 1, 2024. It was then approved with a condition that the tower has no lights unless another agency requires them." },
-  { rid: "pzdb:224", q: "Approve the Walmart expansion on US 41?", ctx: "The store on S Tamiami Trl asked to expand its building.", ans: 0, then: "Approved, and the board asked Walmart to consider routing its trucks off US 41." },
-  { rid: "vc:1044", q: "Approve Mayfair Village, new homes between Broadway Ave E and Sandy Ln?", ctx: "Second reading for a residential planned development near the new downtown area.", ans: 0, then: "Approved, with added conditions including that the fence in the pattern book must be maintained by the owner or HOA." }
+  { rid: "vc:297", q: "A request to rezone part of Estero Town Center so a Firestone auto care shop could open.", ctx: "The request had been continued at earlier meetings before this one.", then: "The rezoning request was denied." },
+  { rid: "pzdb:558", q: "A zoning amendment to allow new signage at Miromar Outlets.", ctx: "The board was asked to recommend the amendment.", then: "The motion did not pass at the board. The related ordinance later came to the Village Council, which adopted it in June 2022." },
+  { rid: "vc:593", q: "An ordinance allowing a cell tower on Bella Terra Blvd, at its public hearing.", ctx: "This was the second reading of the ordinance.", then: "The item was continued to May 1, 2024, when it was approved with a condition that the tower has no lights unless another agency requires them." },
+  { rid: "pzdb:224", q: "A request to expand the Walmart store on US 41.", ctx: "The store on S Tamiami Trl asked to expand its building.", then: "The expansion was approved, and the board asked Walmart to consider routing its trucks off US 41." },
+  { rid: "vc:1044", q: "Mayfair Village, new homes between Broadway Ave E and Sandy Ln.", ctx: "Second reading for a residential planned development near the new downtown area.", then: "Approved, with added conditions including that the fence in the pattern book is maintained by the owner or HOA." }
 ];
+const BODY_NAME = { "Village Council": "Village Council", "Planning Zoning & Design Board": "Planning, Zoning & Design Board", "Public Hearing": "Village Council", "Workshop": "Village Council" };
 
 /* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
@@ -171,13 +173,14 @@ function whenNear(el, fn) {
   initYearRange();
   window.WED.toc.init({ tree: "toc", crumbs: "tocCrumbs", toggle: "tocToggle", panel: "tocPanel" });
   initTimeline(snap);
+  initCouncil(snap);
 
   try { Esri = await loadEsri(); }
   catch (e) { document.querySelectorAll(".map").forEach(m => m.innerHTML = '<div class="map-loading">Map library could not load.</div>'); setBadge("off", "Maps could not load"); return; }
 
   whenNear($("mapExplore"), () => explore(snap));
   whenNear($("mapDrive"), () => drive(live));
-  whenNear($("mapCouncil"), () => council(snap));
+  whenNear($("mapCouncil"), () => council());
   whenNear($("mapTime"), () => timeMachine(snap, live));
   whenNear($("mapGuess"), () => guess(live));
 })();
@@ -463,45 +466,63 @@ function drive(live) {
   setRoute("US 41");
 }
 
-/* ---------- 3 COUNCIL ---------- */
-function council(snap) {
-  const byId = Object.fromEntries(snap.rows.map(r => [r.rid, r]));
-  const cases = CASES.filter(c => byId[c.rid] && byId[c.rid].lat != null);
-  const { view, layer } = basicView("mapCouncil");
-  let ci = 0, score = [];
+/* ---------- 3 COUNCIL: deciding body + outcome only ---------- */
+// Guess choices map to outcome groups: 0 approved, 1 denied/failed, 2 continued/tabled.
+const COUNCIL_CHOICES = [["Approved", 0], ["Denied or failed", 1], ["Continued", 2]];
+const councilMap = { show: () => {}, all: () => {} };   // replaced by the map when ArcGIS loads
+
+function initCouncil(snap) {
+  const S = window.WED.store, byId = S.decisionsById;
+  const cases = CASES.filter(c => byId.get(c.rid));
+  let ci = 0;
   const box = $("caseBox"), prog = $("prog");
   cases.forEach(() => prog.appendChild(document.createElement("span")));
-  const choices = [["Approve", 0], ["Deny", 1], ["Push it back", 2]];
-  const ring = r => new Esri.Graphic({ geometry: new Esri.Point({ longitude: r.lng, latitude: r.lat }), symbol: { type: "simple-marker", color: [0, 0, 0, 0], size: 28, outline: { color: css("--sun"), width: 3 } } });
+  const bodyOf = r => BODY_NAME[r.typeName] || r.typeName;
+  const door = r => {
+    const p = S.projectsForDecision(r.rid)[0];
+    return `<button class="door-sm" data-open-decision="${esc(r.rid)}">${p ? `Open ${esc(p.name)} in contents` : "Open this decision in contents"} →</button>`;
+  };
   function show() {
-    [...prog.children].forEach((s, i) => s.className = i < score.length ? (score[i] ? "hit" : "miss") : (i === ci ? "now" : ""));
-    layer.removeAll();
+    [...prog.children].forEach((s, i) => s.className = i < ci ? "done" : i === ci ? "now" : "");
     if (ci >= cases.length) {
-      const s = score.filter(Boolean).length;
-      cases.forEach(c => layer.add(dot(byId[c.rid], css("--sun"), 12)));
-      view.when(() => view.goTo({ center: CONFIG.center, zoom: CONFIG.zoom }));
-      box.innerHTML = `<span class="eyebrow">Your result</span><div class="big">${s} / ${cases.length}</div><p>You made the same call as the Village on ${s} of ${cases.length} cases. ${s >= 4 ? "You'd fit right in on the dais." : "Plenty of residents would side with you. Public comment is open at every meeting."}</p><div class="row"><button id="again">Play again</button></div>`;
-      $("again").onclick = () => { ci = 0; score = []; show(); };
+      councilMap.all(cases.map(c => byId.get(c.rid)));
+      box.innerHTML = `<span class="eyebrow">The five cases</span>
+        <ul class="case-sum">${cases.map(c => { const r = byId.get(c.rid); return `<li><span class="pill o${r.out}">${esc(r.status)}</span><div><b>${esc(bodyOf(r))}</b> · ${fmtDate(r.date)}<br><span class="muted">${esc(c.q)}</span><br>${door(r)}</div></li>`; }).join("")}</ul>
+        <p class="muted">Public comment is open at Village Council and board meetings.</p>
+        <div class="row"><button id="again">Start over</button></div>`;
+      $("again").onclick = () => { ci = 0; show(); };
       return;
     }
-    const c = cases[ci], r = byId[c.rid];
-    layer.addMany([ring(r), dot(r, css("--sun"), 9)]);
-    view.when(() => view.goTo({ center: [r.lng, r.lat], zoom: 15 }));
-    box.innerHTML = `<span class="eyebrow">Case ${ci + 1} of ${cases.length} · ${fmtDate(r.date)} · ${esc(TYPE_SHORT[r.typeName])}</span><h3>${esc(c.q)}</h3><p class="muted">${esc(c.ctx)}</p><p class="mono" style="font-size:.8rem">${esc(r.loc)}</p><div class="row" id="vote"></div>`;
+    const c = cases[ci], r = byId.get(c.rid);
+    councilMap.show(r);
+    box.innerHTML = `<span class="eyebrow">Case ${ci + 1} of ${cases.length} · ${fmtDate(r.date)}</span><h3>${esc(c.q)}</h3><p class="muted">${esc(c.ctx)}</p><p class="mono" style="font-size:.8rem">${esc(r.loc)}</p><p><b>What do you think happened?</b></p><div class="row" id="vote"></div>`;
     const v = $("vote");
-    choices.forEach(([lab, val]) => {
+    COUNCIL_CHOICES.forEach(([lab]) => {
       const b = document.createElement("button"); b.textContent = lab;
       b.onclick = () => {
-        const hit = val === c.ans; score.push(hit);
         v.querySelectorAll("button").forEach(x => { x.disabled = true; if (x === b) x.setAttribute("aria-pressed", "true"); });
-        [...prog.children][ci].className = hit ? "hit" : "miss";
-        box.insertAdjacentHTML("beforeend", `<div class="verdict"><strong>${hit ? "Same call as the Village." : "The Village went another way."}</strong><span><span class="pill o${r.out}">${esc(r.status)}</span></span><span>${esc(c.then)}</span><a href="${esc(r.url)}" target="_blank" rel="noopener">Read the minutes, item ${r.no}</a></div><div class="row"><button class="primary" id="next">${ci < cases.length - 1 ? "Next case" : "See my result"}</button></div>`);
+        box.insertAdjacentHTML("beforeend", `<div class="verdict">
+          <dl class="facts-dl"><dt>Deciding body</dt><dd>${esc(bodyOf(r))}</dd><dt>Outcome</dt><dd><span class="pill o${r.out}">${esc(r.status)}</span></dd></dl>
+          <span>${esc(c.then)}</span>
+          <a href="${esc(r.url)}" target="_blank" rel="noopener">Read the minutes, item ${r.no}</a>
+          ${door(r)}
+        </div><div class="row"><button class="primary" id="next">${ci < cases.length - 1 ? "Next case" : "See all five"}</button></div>`);
         $("next").onclick = () => { ci++; show(); };
       };
       v.appendChild(b);
     });
   }
   show();
+}
+
+function council() {
+  const { view, layer } = basicView("mapCouncil");
+  const ring = r => new Esri.Graphic({ geometry: new Esri.Point({ longitude: r.lng, latitude: r.lat }), symbol: { type: "simple-marker", color: [0, 0, 0, 0], size: 28, outline: { color: css("--sun"), width: 3 } } });
+  councilMap.show = r => { layer.removeAll(); if (r.lat == null) return; layer.addMany([ring(r), dot(r, css("--sun"), 9)]); view.when(() => view.goTo({ center: [r.lng, r.lat], zoom: 15 })); };
+  councilMap.all = rs => { layer.removeAll(); rs.filter(r => r.lat != null).forEach(r => layer.add(dot(r, outColor(r.out), 12))); view.when(() => view.goTo({ center: CONFIG.center, zoom: CONFIG.zoom })); };
+  const cur = $("caseBox").querySelector(".eyebrow")?.textContent.match(/Case (\d+)/);
+  const idx = cur ? +cur[1] - 1 : -1, list = CASES.map(c => window.WED.store.decisionsById.get(c.rid)).filter(Boolean);
+  idx >= 0 ? councilMap.show(list[idx]) : councilMap.all(list);
 }
 
 /* ---------- 4 TIME: the slider writes the shared year range; everything else follows ---------- */
