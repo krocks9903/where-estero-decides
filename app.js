@@ -540,15 +540,27 @@ function timeMachine(snap, live) {
 }
 
 /* ---------- 5 GUESS ---------- */
-function guess(live) {
-  const { view, layer } = basicView("mapGuess", { popupEnabled: false });
-  const cell = 0.006, grid = {};
-  live.forEach(r => { const k = Math.floor(r.lat / cell) + "|" + Math.floor(r.lng / cell); (grid[k] = grid[k] || []).push(r); });
-  const hots = Object.values(grid).map(g => {
+/** Group mapped decisions into ~0.4-mile cells, busiest first. Each cell keeps its rows for the side doors. */
+function hotspots(rows, cell = 0.006) {
+  const grid = {};
+  rows.forEach(r => { const k = Math.floor(r.lat / cell) + "|" + Math.floor(r.lng / cell); (grid[k] = grid[k] || []).push(r); });
+  return Object.values(grid).map(g => {
     const lat = g.reduce((s, r) => s + r.lat, 0) / g.length, lng = g.reduce((s, r) => s + r.lng, 0) / g.length, lc = {};
     g.forEach(r => lc[r.loc] = (lc[r.loc] || 0) + 1);
-    return { n: g.length, lat, lng, name: Object.entries(lc).sort((a, b) => b[1] - a[1])[0][0] };
+    return { n: g.length, lat, lng, rows: g, name: Object.entries(lc).sort((a, b) => b[1] - a[1])[0][0] };
   }).sort((a, b) => b.n - a.n);
+}
+/** Links from the busiest spot into the contents: its projects, plus its latest decision. */
+function hotspotDoorsHTML(h) {
+  const doors = projectDoorsHTML(h.rows);
+  const latest = h.rows.filter(r => r.rid).sort((a, b) => b.date.localeCompare(a.date))[0];
+  return `<div class="doorbox"><span class="eyebrow">Explore this spot</span>` +
+    (doors ? `<div class="doors">${doors}</div>` : '<p class="muted">No decisions here are linked to a project in the data yet.</p>') +
+    (latest ? `<button class="door-sm" data-open-decision="${esc(latest.rid)}">Latest decision here: ${fmtDate(latest.date)} →</button>` : "") + `</div>`;
+}
+function guess(live) {
+  const { view, layer } = basicView("mapGuess", { popupEnabled: false });
+  const hots = hotspots(live);
   const top = hots[0], out = $("guessOut"); let guessed = false;
   view.on("click", e => {
     if (guessed || !e.mapPoint) return; guessed = true;
@@ -563,7 +575,7 @@ function guess(live) {
     const toXY = (la, ln) => [ln * 111320 * Math.cos(26.43 * Math.PI / 180), la * 110540];
     const [ax, ay] = toXY(g.lat, g.lng), [bx, by] = toXY(top.lat, top.lng);
     const miles = Math.hypot(ax - bx, ay - by) / 1609.34;
-    out.innerHTML = `<span class="eyebrow">${miles < .4 ? "Nailed it" : miles < 1.5 ? "Close" : "Not quite"}</span><div class="big">${miles.toFixed(1)} mi</div><p>from the busiest spot: <strong>${top.n} mapped items</strong> in one patch about 0.4 miles across, centered near <strong>${esc(top.name)}</strong>.</p><p class="muted">Next four busiest areas: ${hots.slice(1, 5).map(h => `${esc(h.name)} (${h.n})`).join(", ")}.</p>`;
+    out.innerHTML = `<span class="eyebrow">${miles < .4 ? "Nailed it" : miles < 1.5 ? "Close" : "Not quite"}</span><div class="big">${miles.toFixed(1)} mi</div><p>from the busiest spot: <strong>${top.n} mapped items</strong> in one patch about 0.4 miles across, centered near <strong>${esc(top.name)}</strong>.</p><p class="muted">Next four busiest areas: ${hots.slice(1, 5).map(h => `${esc(h.name)} (${h.n})`).join(", ")}.</p>` + hotspotDoorsHTML(top);
   });
   $("guessReset").onclick = () => { guessed = false; layer.removeAll(); out.innerHTML = '<p class="muted">No guess yet. Tap anywhere on the map.</p>'; };
 }
