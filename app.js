@@ -71,13 +71,10 @@ const itemHTML = (r, link = true) => `<div class="item"><span class="d">${fmtDat
 const popupHTML = r => `<p style="margin:0 0 6px"><b>${fmtDate(r.date)}</b> · ${esc(TYPE_SHORT[r.typeName] || r.typeName || "")}${r.no ? " · item " + r.no : ""}</p><p style="margin:0 0 6px"><b>${esc(r.status)}</b>. ${esc(r.action)}</p><p style="margin:0 0 6px"><i>${esc(r.loc)}</i></p>${r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">Read the minutes</a>` : ""}`;
 
 /* ---------- data ---------- */
+// Decisions + projects are loaded once by js/store.js; this keeps the original snapshot shape.
 async function loadSnapshot() {
-  const d = await (await fetch("data/decisions.json")).json();
-  const rows = d.rows.map(r => ({
-    date: r[0], year: +r[0].slice(0, 4), catName: d.cats[r[1]], out: r[2], typeName: d.types[r[3]],
-    title: r[4], action: r[5], loc: r[6], lat: r[7], lng: r[8], url: d.urls[r[9]], no: r[10], status: r[11], rid: r[12]
-  }));
-  return { cats: d.cats, types: d.types, rows };
+  const store = await window.WED.store.load();
+  return store.snapshot;
 }
 
 async function loadLive() {
