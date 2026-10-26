@@ -74,12 +74,12 @@ const itemHTML = (r, link = true, door = false) => {
 
 /* ---------- side doors: any section can hand a decision or project to the contents ---------- */
 /** Buttons for the projects linked to a set of decision rows, most-linked first. */
-function projectDoorsHTML(rows, max = 5) {
+function projectDoorsHTML(rows, max = 5, where = "here") {
   const S = window.WED.store, n = new Map();
   rows.forEach(r => r.rid && S.projectsForDecision(r.rid).forEach(p => n.set(p.project_id, (n.get(p.project_id) || 0) + 1)));
   return [...n.entries()].sort((a, b) => b[1] - a[1]).slice(0, max).map(([id, k]) => {
     const p = S.projectsById.get(id);
-    return `<button class="door" data-open-project="${esc(id)}">${window.WED.sym.swatch({ group: p.sponsor_group, category: p.category, status: p.status, size: 14 })}<span>${esc(p.name)}</span><small>${k} here</small><span aria-hidden="true">→</span></button>`;
+    return `<button class="door" data-open-project="${esc(id)}">${window.WED.sym.swatch({ group: p.sponsor_group, category: p.category, status: p.status, size: 14 })}<span>${esc(p.name)}</span><small>${k} ${esc(where)}</small><span aria-hidden="true">→</span></button>`;
   }).join("");
 }
 document.addEventListener("click", e => {
@@ -170,6 +170,7 @@ function whenNear(el, fn) {
   if ($("mapKey")) $("mapKey").innerHTML = window.WED.sym.legendHTML();
   initYearRange();
   window.WED.toc.init({ tree: "toc", crumbs: "tocCrumbs", toggle: "tocToggle", panel: "tocPanel" });
+  initTimeline(snap);
 
   try { Esri = await loadEsri(); }
   catch (e) { document.querySelectorAll(".map").forEach(m => m.innerHTML = '<div class="map-loading">Map library could not load.</div>'); setBadge("off", "Maps could not load"); return; }
@@ -503,40 +504,61 @@ function council(snap) {
   show();
 }
 
-/* ---------- 4 TIME ---------- */
-function timeMachine(snap, live) {
-  const { view, layer } = basicView("mapTime");
-  const all = []; for (let y = 2015; y <= 2026; y++) all.push(y);
+/* ---------- 4 TIME: the slider writes the shared year range; everything else follows ---------- */
+function initTimeline(snap) {
+  const S = window.WED.store, [y0, y1] = S.yearSpan, all = [];
+  for (let y = y0; y <= y1; y++) all.push(y);
   const yc = Object.fromEntries(all.map(y => [y, snap.rows.filter(r => r.year === y).length]));
   const ymax = Math.max(...Object.values(yc));
-  const spark = $("spark");
+  const spark = $("spark"), yr = $("yr");
+  spark.style.gridTemplateColumns = $("yearline").style.gridTemplateColumns = `repeat(${all.length},1fr)`;
   all.forEach(y => { const i = document.createElement("i"); i.style.height = (yc[y] / ymax * 100) + "%"; if (!yc[y]) i.className = "gap"; i.title = `${y}: ${yc[y]}`; spark.appendChild(i); });
   $("yearline").innerHTML = all.map(y => `<span>'${String(y).slice(2)}</span>`).join("");
+  yr.min = y0; yr.max = y1;
+
+  function render() {
+    const { from, to } = S.state; let c = 0;
+    all.forEach(y => { if (y >= from && y <= to) c += yc[y]; });
+    yr.value = to;
+    [...spark.children].forEach((b, i) => b.classList.toggle("on", all[i] >= from && all[i] <= to));
+    $("tYear").textContent = from === to ? to : `${from}–${to}`;
+    $("tCount").textContent = `${c.toLocaleString()} agenda items in this range · ${yc[to]} in ${to}`;
+    const rowsY = snap.rows.filter(r => r.year === to), lc = {};
+    rowsY.filter(r => r.lat != null).forEach(r => { lc[r.loc] = (lc[r.loc] || 0) + 1; });
+    const top = Object.entries(lc).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    const nProj = S.visibleProjects().length, doors = projectDoorsHTML(rowsY, 4, `in ${to}`);
+    $("tTop").innerHTML = (!yc[to] ? `<strong>No records for ${to} in this dataset.</strong> That year's minutes still need to be added.`
+      : top.length ? `<span class="eyebrow">Busiest places in ${to}</span><br>${top.map(t => `${esc(t[0])} <span class="mono">(${t[1]})</span>`).join("<br>")}` : "") +
+      `<div class="doorbox"><span class="eyebrow">Projects with decisions in ${to}</span>${doors ? `<div class="doors">${doors}</div>` : '<p class="muted">None linked in the data yet.</p>'}` +
+      `<button class="door-sm" id="tToToc">See all ${nProj} project${nProj === 1 ? "" : "s"} for ${from}–${to} in the contents →</button></div>`;
+  }
+  yr.oninput = () => { const v = +yr.value; S.set({ to: v, from: Math.min(S.state.from, v) }, "timeline"); };
+  $("tTop").addEventListener("click", e => { if (e.target.id === "tToToc") $("explore").scrollIntoView({ behavior: "smooth", block: "start" }); });
+  S.on("change", ({ state, prev }) => { if (state.from !== prev.from || state.to !== prev.to || state.off !== prev.off) render(); });
+  render();
+
+  let playT = null; const pb = $("playBtn");
+  const stop = () => { clearInterval(playT); playT = null; pb.textContent = "Play the decade"; };
+  pb.onclick = () => {
+    if (playT) return stop();
+    S.set({ from: y0, to: y0 }, "timeline"); pb.textContent = "Pause";
+    playT = setInterval(() => { if (S.state.to >= y1) return stop(); S.set({ to: S.state.to + 1 }, "timeline"); }, 900);
+  };
+}
+
+function timeMachine(snap, live) {
+  const S = window.WED.store, { view, layer } = basicView("mapTime");
   const graphics = live.map(r => ({ r, g: dot(r, css("--bay"), 7) }));
-  const yr = $("yr");
   function upd() {
-    const v = +yr.value; let c = 0;
+    const { from, to } = S.state;
     layer.removeAll();
-    layer.addMany(graphics.filter(x => x.r.year <= v).map(x => {
-      x.g.symbol = { type: "simple-marker", color: x.r.year === v ? css("--sun") : css("--bay"), size: x.r.year === v ? 10 : 7, outline: { color: css("--surface"), width: 1 } };
+    layer.addMany(graphics.filter(x => x.r.year >= from && x.r.year <= to).map(x => {
+      x.g.symbol = { type: "simple-marker", color: x.r.year === to ? css("--sun") : css("--bay"), size: x.r.year === to ? 10 : 7, outline: { color: css("--surface"), width: 1 } };
       return x.g;
     }));
-    all.forEach(y => { if (y <= v) c += yc[y]; });
-    [...spark.children].forEach((b, i) => b.classList.toggle("on", all[i] <= v));
-    $("tYear").textContent = v;
-    $("tCount").textContent = `${c.toLocaleString()} agenda items through ${v} · ${yc[v]} in ${v}`;
-    const lc = {}; live.filter(r => r.year === v).forEach(r => { lc[r.loc] = (lc[r.loc] || 0) + 1; });
-    const top = Object.entries(lc).sort((a, b) => b[1] - a[1]).slice(0, 3);
-    $("tTop").innerHTML = !yc[v] ? `<strong>No records for ${v} in this dataset.</strong> That year's minutes still need to be added.`
-      : top.length ? `<span class="eyebrow">Busiest places in ${v}</span><br>${top.map(t => `${esc(t[0])} <span class="mono">(${t[1]})</span>`).join("<br>")}` : "";
   }
-  yr.oninput = upd; upd();
-  let playT = null; const pb = $("playBtn");
-  pb.onclick = () => {
-    if (playT) { clearInterval(playT); playT = null; pb.textContent = "Play the decade"; return; }
-    yr.value = 2015; upd(); pb.textContent = "Pause";
-    playT = setInterval(() => { if (+yr.value >= 2026) { clearInterval(playT); playT = null; pb.textContent = "Play the decade"; return; } yr.value = +yr.value + 1; upd(); }, 900);
-  };
+  S.on("change", ({ state, prev }) => { if (state.from !== prev.from || state.to !== prev.to) upd(); });
+  upd();
 }
 
 /* ---------- 5 GUESS ---------- */
