@@ -67,7 +67,27 @@ function trimAction(s) { s = (s || "").replace(/\s+/g, " ").trim(); return s.len
 
 function setBadge(state, text) { const b = $("liveBadge"); b.className = "live " + state; b.querySelector("span").textContent = text; }
 
-const itemHTML = (r, link = true) => `<div class="item"><span class="d">${fmtDate(r.date)}</span><div class="t"><b>${esc(r.title)}</b><small>${esc(r.action)}</small><small>${esc(TYPE_SHORT[r.typeName] || r.typeName || "")}${r.loc ? " · " + esc(r.loc) : ""}</small>${link && r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">Read the minutes${r.no ? ", item " + r.no : ""}</a>` : ""}</div><span class="pill o${r.out}">${esc(r.status)}</span></div>`;
+const itemHTML = (r, link = true, door = false) => {
+  const proj = door && r.rid ? window.WED.store.projectsForDecision(r.rid)[0] : null;
+  return `<div class="item"><span class="d">${fmtDate(r.date)}</span><div class="t"><b>${esc(r.title)}</b><small>${esc(r.action)}</small><small>${esc(TYPE_SHORT[r.typeName] || r.typeName || "")}${r.loc ? " · " + esc(r.loc) : ""}</small>${proj ? `<small class="in-proj">Part of ${esc(proj.name)}</small>` : ""}${link && r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">Read the minutes${r.no ? ", item " + r.no : ""}</a>` : ""}${door && r.rid ? `<button class="door-sm" data-open-decision="${esc(r.rid)}">Open in contents →</button>` : ""}</div><span class="pill o${r.out}">${esc(r.status)}</span></div>`;
+};
+
+/* ---------- side doors: any section can hand a decision or project to the contents ---------- */
+/** Buttons for the projects linked to a set of decision rows, most-linked first. */
+function projectDoorsHTML(rows, max = 5) {
+  const S = window.WED.store, n = new Map();
+  rows.forEach(r => r.rid && S.projectsForDecision(r.rid).forEach(p => n.set(p.project_id, (n.get(p.project_id) || 0) + 1)));
+  return [...n.entries()].sort((a, b) => b[1] - a[1]).slice(0, max).map(([id, k]) => {
+    const p = S.projectsById.get(id);
+    return `<button class="door" data-open-project="${esc(id)}">${window.WED.sym.swatch({ group: p.sponsor_group, category: p.category, status: p.status, size: 14 })}<span>${esc(p.name)}</span><small>${k} here</small><span aria-hidden="true">→</span></button>`;
+  }).join("");
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-open-project],[data-open-decision]");
+  if (!b || !window.WED.toc) return;
+  e.preventDefault();
+  window.WED.toc.focus(b.dataset.openProject ? { project: b.dataset.openProject } : { decision: b.dataset.openDecision }, { source: "side-door" });
+});
 const popupHTML = r => `<p style="margin:0 0 6px"><b>${fmtDate(r.date)}</b> · ${esc(TYPE_SHORT[r.typeName] || r.typeName || "")}${r.no ? " · item " + r.no : ""}</p><p style="margin:0 0 6px"><b>${esc(r.status)}</b>. ${esc(r.action)}</p><p style="margin:0 0 6px"><i>${esc(r.loc)}</i></p>${r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">Read the minutes</a>` : ""}`;
 
 /* ---------- data ---------- */
@@ -407,6 +427,14 @@ function drive(live) {
     passedEl.textContent = "0"; $("passedSub").textContent = `of ${hits.length} decisions along ${name}`;
     stat.textContent = "Ready"; go.disabled = false;
     feed.innerHTML = '<p class="muted" style="padding-top:8px">Decisions show up here as you pass them. Newest pass on top.</p>';
+    $("driveDoors").hidden = true;
+  }
+  function showDoors() {
+    const name = $("routeBtns").querySelector('[aria-pressed="true"]')?.textContent || "this road";
+    const html = projectDoorsHTML(hits.map(h => h.r));
+    $("driveDoors").hidden = false;
+    $("driveDoors").innerHTML = `<span class="eyebrow">Projects along ${esc(name)}</span>` +
+      (html ? `<div class="doors">${html}</div>` : '<p class="muted">None of these decisions are linked to a project in the data yet. Open any decision above to see it in the contents.</p>');
   }
   const rb = $("routeBtns");
   Object.keys(ROADS).forEach(n => { const b = document.createElement("button"); b.textContent = n; b.onclick = () => setRoute(n); rb.appendChild(b); });
@@ -422,12 +450,12 @@ function drive(live) {
           h.done = true; n++;
           h.g.symbol = { type: "simple-marker", color: outColor(h.r.out), size: 10, outline: { color: css("--surface"), width: 1 } };
           if (feed.children.length >= 6) feed.lastChild.remove();
-          feed.insertAdjacentHTML("afterbegin", itemHTML(h.r, false));
+          feed.insertAdjacentHTML("afterbegin", itemHTML(h.r, false, true));
         }
       });
       passedEl.textContent = n;
       if (f < 1) anim = requestAnimationFrame(step);
-      else { anim = null; stat.textContent = "Trip done. Click any dot for details."; go.disabled = false; }
+      else { anim = null; stat.textContent = "Trip done. Click any dot for details."; go.disabled = false; showDoors(); }
     };
     anim = requestAnimationFrame(step);
   };
