@@ -17,7 +17,7 @@
   <div class="topnav-in">
     <a class="brand" href="#top"><img src="assets/engage-estero-logo.png" alt="Engage Estero" width="120" height="51"><span class="brand-tag">Inform · Explore · Shape</span></a>
     <div class="toplinks">
-      <a href="#explore">Explore</a><a href="#drive">Drive</a><a href="#council">Council</a><a href="#guess">Hotspot</a><a href="#time">Timeline</a><a href="#about">About</a>
+      <a href="#explore">Explore</a><a href="#story">Story</a><a href="#drive">Drive</a><a href="#council">Council</a><a href="#guess">Hotspot</a><a href="#time">Timeline</a><a href="#about">About</a>
     </div>
   </div>
 </nav>
@@ -40,6 +40,7 @@
     <ol id="rail">
       <li><a href="#welcome" data-sec="welcome">Welcome</a></li>
       <li><a href="#explore" data-sec="explore">Explore the map</a></li>
+      <li><a href="#story" data-sec="story">Current story</a></li>
       <li><a href="#drive" data-sec="drive">Take the drive</a></li>
       <li><a href="#council" data-sec="council">You're on the council</a></li>
       <li><a href="#guess" data-sec="guess">Guess the hotspot</a></li>
@@ -99,6 +100,16 @@
         <div class="list" id="list"></div>
         <div class="listhead" style="justify-content:center"><button id="more">Show more</button></div>
       </div>
+    </section>
+
+    <!-- CURRENT STORY -->
+    <section class="chapter" id="story">
+      <div class="chapter-head plain">
+        <span class="eyebrow">Current story</span>
+        <h2>Where things stand</h2>
+        <p>A plain summary built from the project and decision records, organized the same way as the contents. It follows the year range and layers you pick above. Every line links to its source.</p>
+      </div>
+      <article class="story" id="storyBody" aria-live="polite"><p class="muted">Building the story from the records…</p></article>
     </section>
 
     <!-- 2 DRIVE -->
@@ -187,6 +198,7 @@
 <script src="js/store.js"></script>
 <script src="js/symbology.js"></script>
 <script src="js/toc.js"></script>
+<script src="js/story.js"></script>
 <script src="app.js"></script>
 <script>
 // chapter rail + nav state

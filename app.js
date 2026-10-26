@@ -174,6 +174,7 @@ function whenNear(el, fn) {
   window.WED.toc.init({ tree: "toc", crumbs: "tocCrumbs", toggle: "tocToggle", panel: "tocPanel" });
   initTimeline(snap);
   initCouncil(snap);
+  window.WED.story.init("storyBody");
 
   try { Esri = await loadEsri(); }
   catch (e) { document.querySelectorAll(".map").forEach(m => m.innerHTML = '<div class="map-loading">Map library could not load.</div>'); setBadge("off", "Maps could not load"); return; }
